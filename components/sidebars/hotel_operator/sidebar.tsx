@@ -8,152 +8,75 @@ import {
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+import {
+  GalleryVerticalEndIcon,
+  LayoutDashboardIcon,
+  CreditCardIcon,
+  ArrowRightLeftIcon,
+  Building2Icon,
+  BarChart3Icon,
+  AlertCircleIcon,
+  PieChartIcon,
+  SettingsIcon,
+} from "lucide-react"
 
-// This is sample data.
-const data = {
+interface NavItem {
+  title: string
+  url: string
+  icon: LucideIcon
+  notifications?: number
+}
+
+const DIRECTORY = "/hotel_operator"
+
+const data: { navMain: NavItem[] } = {
   navMain: [
     {
-      title: "Getting Started",
-      url: "#",
-      items: [
-        {
-          title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
+      title: "Overview",
+      url: DIRECTORY,
+      icon: LayoutDashboardIcon,
     },
     {
-      title: "Build Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
-      ],
+      title: "Settlements",
+      url: `${DIRECTORY}/settlements`,
+      icon: CreditCardIcon,
     },
     {
-      title: "API Reference",
-      url: "#",
-      items: [
-        {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
-        {
-          title: "Edge Runtime",
-          url: "#",
-        },
-      ],
+      title: "Transactions",
+      url: `${DIRECTORY}/transactions`,
+      icon: ArrowRightLeftIcon,
     },
     {
-      title: "Architecture",
-      url: "#",
-      items: [
-        {
-          title: "Accessibility",
-          url: "#",
-        },
-        {
-          title: "Fast Refresh",
-          url: "#",
-        },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
-      ],
+      title: "Corporate clients",
+      url: `${DIRECTORY}/corporate_clients`,
+      icon: Building2Icon,
     },
     {
-      title: "Community",
-      url: "#",
-      items: [
-        {
-          title: "Contribution Guide",
-          url: "#",
-        },
-      ],
+      title: "Revenue reports",
+      url: `${DIRECTORY}/revenue_reports`,
+      icon: BarChart3Icon,
+    },
+    {
+      title: "Disputes",
+      url: `${DIRECTORY}/disputes`,
+      icon: AlertCircleIcon,
+      notifications: 2,
+    },
+    {
+      title: "VAT reports",
+      url: `${DIRECTORY}/vat_reports`,
+      icon: PieChartIcon,
+    },
+    {
+      title: "Settings",
+      url: `${DIRECTORY}/settings`,
+      icon: SettingsIcon,
     },
   ],
 }
@@ -165,13 +88,13 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <a href={DIRECTORY}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <GalleryVerticalEndIcon className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-medium">Documentation</span>
-                  <span className="">v1.0.0</span>
+                  <span className="font-bold">yoGuide</span>
+                  <span className="text-xs text-muted-foreground">Hotel Operator Portal</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -181,26 +104,25 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {data.navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url} className="font-medium">
-                    {item.title}
-                  </a>
-                </SidebarMenuButton>
-                {item.items?.length ? (
-                  <SidebarMenuSub>
-                    {item.items.map((item) => (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild isActive={item.isActive}>
-                          <a href={item.url}>{item.title}</a>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                ) : null}
-              </SidebarMenuItem>
-            ))}
+            {data.navMain.map((item) => {
+              const Icon = item.icon
+
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton className="hover:bg-blue-200" asChild>
+                    <a href={item.url} className="flex items-center gap-2 font-semibold m-2">
+                      <Icon className="size-4 shrink-0 text-sidebar-foreground" />
+                      <span className="truncate">{item.title}</span>
+                      {typeof item.notifications === "number" && item.notifications > 0 ? (
+                        <SidebarMenuBadge className="bg-red-200 text-red-900">
+                          {item.notifications}
+                        </SidebarMenuBadge>
+                      ) : null}
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

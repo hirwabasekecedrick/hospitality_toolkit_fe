@@ -1,20 +1,8 @@
 "use client"
 
 import { Hotel_Operator_Sidebar } from "@/components/sidebars/hotel_operator/sidebar"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
+import { HotelOperatorHeader } from "@/components/headers/hotel_operator_header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import React from "react"
 
 export default function HotelOperatorLayout({
@@ -26,29 +14,8 @@ export default function HotelOperatorLayout({
     <SidebarProvider>
       <Hotel_Operator_Sidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-          <div className="flex items-center gap-2 px-3">
-            <SidebarTrigger />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-vertical:h-4 data-vertical:self-auto"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Build Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
+        <HotelOperatorHeader />
+        <div className="flex flex-1 flex-col gap-4 p-3 sm:p-4">
           {children}
         </div>
       </SidebarInset>
