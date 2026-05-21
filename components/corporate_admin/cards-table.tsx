@@ -1,0 +1,156 @@
+"use client"
+
+import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { MoreHorizontalIcon, CreditCardIcon, BanIcon, Edit2Icon, RefreshCcwIcon } from "lucide-react"
+
+// Mock Data
+const MOCK_CARDS = [
+  { id: "1", type: "Physical", cardholder: "John Doe", last4: "4321", status: "Active", limit: "RWF 500,000", lastUsed: "Today" },
+  { id: "2", type: "Virtual", cardholder: "Marketing Dept", last4: "8765", status: "Active", limit: "RWF 2,000,000", lastUsed: "Yesterday" },
+  { id: "3", type: "Physical", cardholder: "Jane Smith", last4: "1122", status: "Suspended", limit: "RWF 1,000,000", lastUsed: "3 days ago" },
+  { id: "4", type: "Virtual", cardholder: "IT Infrastructure", last4: "9988", status: "Active", limit: "RWF 5,000,000", lastUsed: "Last week" },
+  { id: "5", type: "Physical", cardholder: "Michael Johnson", last4: "5544", status: "Cancelled", limit: "RWF 0", lastUsed: "1 month ago" },
+]
+
+export function CardsTable() {
+  const [filterType, setFilterType] = useState("all")
+  const [filterStatus, setFilterStatus] = useState("all")
+
+  const filteredCards = MOCK_CARDS.filter(card => {
+    if (filterType !== "all" && card.type.toLowerCase() !== filterType) return false
+    if (filterStatus !== "all" && card.status.toLowerCase() !== filterStatus) return false
+    return true
+  })
+
+  return (
+    <div className="space-y-4">
+      {/* Filters */}
+      <div className="flex flex-wrap gap-4 items-center">
+        <Select value={filterType} onValueChange={setFilterType}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Card Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="physical">Physical</SelectItem>
+            <SelectItem value="virtual">Virtual</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="suspended">Suspended</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
+              <tr>
+                <th className="px-6 py-4">Card Info</th>
+                <th className="px-6 py-4">Type</th>
+                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Spend Limit</th>
+                <th className="px-6 py-4">Last Used</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {filteredCards.map((card) => (
+                <tr key={card.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        <CreditCardIcon className="size-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900">{card.cardholder}</p>
+                        <p className="font-mono text-xs text-slate-500">**** **** **** {card.last4}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Badge variant="outline" className={card.type === "Virtual" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-slate-50 text-slate-700"}>
+                      {card.type}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Badge 
+                      className={
+                        card.status === "Active" ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-none" : 
+                        card.status === "Suspended" ? "bg-orange-100 text-orange-800 hover:bg-orange-200 border-none" : 
+                        "bg-red-100 text-red-800 hover:bg-red-200 border-none"
+                      }
+                    >
+                      {card.status}
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-slate-700 font-medium">
+                    {card.limit}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-slate-500">
+                    {card.lastUsed}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontalIcon className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem className="cursor-pointer">
+                          <Edit2Icon className="mr-2 h-4 w-4" /> Update limits
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer">
+                          <RefreshCcwIcon className="mr-2 h-4 w-4" /> View transactions
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {card.status === "Active" ? (
+                          <DropdownMenuItem className="cursor-pointer text-orange-600 focus:bg-orange-50 focus:text-orange-700">
+                            <BanIcon className="mr-2 h-4 w-4" /> Suspend card
+                          </DropdownMenuItem>
+                        ) : card.status === "Suspended" ? (
+                          <DropdownMenuItem className="cursor-pointer text-emerald-600 focus:bg-emerald-50 focus:text-emerald-700">
+                            <RefreshCcwIcon className="mr-2 h-4 w-4" /> Reactivate card
+                          </DropdownMenuItem>
+                        ) : null}
+                        {card.status !== "Cancelled" && (
+                          <DropdownMenuItem className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700">
+                            <BanIcon className="mr-2 h-4 w-4" /> Cancel card
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              ))}
+              {filteredCards.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                    No cards found matching your criteria.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}

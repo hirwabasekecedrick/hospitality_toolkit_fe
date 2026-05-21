@@ -125,10 +125,20 @@ function TransactionItem({ transaction }: { transaction: TransactionRecord }) {
   )
 }
 
+import { TransactionLog } from "@/components/corporate_admin/transaction-log"
+
 export default function Page() {
   return (
-    <div className="w-full">
-      {/* <TransactionsOverview /> */}
+    <div className="space-y-6">
+      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold text-slate-950">Transactions</h1>
+            <p className="mt-1 text-sm text-slate-500">View and manage all corporate card transactions, including receipts and tax breakdowns.</p>
+          </div>
+        </div>
+      </div>
+      <TransactionLog />
     </div>
   )
 }
