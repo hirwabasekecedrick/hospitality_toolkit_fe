@@ -1,14 +1,18 @@
 export default function Page() {
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">Disputes</h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Track open disputes and manage resolution workflows for guest charges and vendor invoices.
-        </p>
-      </div>
-      <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
-        <p className="text-sm text-slate-600">There are currently no active disputes to display.</p>
+    <div className="space-y-6 max-w-7xl mx-auto px-0">
+      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Disputes</h1>
+            <p className="mt-2 text-sm text-slate-500">Manage flagged transactions and communicate with corporate admins.</p>
+          </div>
+        </div>
+        <div className="mt-8">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-12 text-center">
+             <p className="text-sm font-medium text-slate-500">No active disputes.</p>
+          </div>
+        </div>
       </div>
     </div>
   )

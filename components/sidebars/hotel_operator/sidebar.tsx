@@ -118,7 +118,7 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
 
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton className="hover:bg-blue-200" asChild>
+                  <SidebarMenuButton className="hover:bg-emerald-50 hover:text-emerald-800 transition-colors" asChild>
                     <a href={item.url} className="flex items-center gap-2 font-semibold m-2" onClick={handleNavClick}>
                       <Icon className="size-4 shrink-0 text-sidebar-foreground" />
                       <span className="truncate">{item.title}</span>
