@@ -34,13 +34,6 @@ export function ApprovalQueue() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">Pending Requests</h2>
-          <p className="text-sm text-slate-500">You have {pendingCount} requests requiring your approval.</p>
-        </div>
-      </div>
-
       <div className="space-y-4">
         {queue.map(item => (
           <div key={item.id} className={`rounded-xl border ${item.status === 'pending' ? 'border-slate-200 bg-white shadow-sm' : 'border-slate-100 bg-slate-50 opacity-60'} p-5 transition-all`}>

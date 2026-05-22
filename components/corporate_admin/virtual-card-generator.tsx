@@ -78,7 +78,7 @@ export function VirtualCardGenerator() {
             </DialogFooter>
           </form>
         ) : (
-          <div className="space-y-6 pt-4 flex flex-col items-center">
+          <div className="space-y-6 p-4 flex flex-col items-center">
             {/* Styled Virtual Card Representation */}
             <div className="relative w-full h-48 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-950 p-6 text-white shadow-xl overflow-hidden flex flex-col justify-between">
               <div className="absolute top-0 right-0 p-4 opacity-10">

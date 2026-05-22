@@ -15,8 +15,11 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import type { LucideIcon } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   GalleryVerticalEndIcon,
   LayoutDashboardIcon,
@@ -87,13 +90,22 @@ const data: { navMain: NavItem[] } = {
 }
 
 export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname() || "/"
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <Link href="/corporate_admin" className="flex items-center gap-3" onClick={handleNavClick}>
                 {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <GalleryVerticalEndIcon className="size-4" />
                 </div> */}
@@ -101,7 +113,7 @@ export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeo
                   <span className="font-bold">yoGuide</span>
                   <span className="text-xs text-muted-foreground">Corporate Hospitality Card</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -111,19 +123,24 @@ export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeo
           <SidebarMenu>
             {data.navMain.map((item) => {
               const Icon = item.icon
+              const isActive = pathname.startsWith(item.url)
+              const linkClass = `flex w-full items-center gap-2 rounded-md px-2 py-2 ${
+                isActive ? "bg-emerald-50 text-emerald-700 font-semibold" : "text-slate-700 hover:bg-emerald-50"
+              }`
+              const iconClass = `size-4 shrink-0 ${isActive ? "text-emerald-700" : "text-slate-400"}`
 
               return (
                 <SidebarMenuItem  key={item.title}>
-                  <SidebarMenuButton className="hover:bg-blue-200" asChild>
-                    <a href={item.url} className="flex items-center gap-2 font-semibold m-2">
-                      <Icon className="size-4 shrink-0 text-sidebar-foreground" />
+                  <SidebarMenuButton asChild>
+                    <Link href={item.url} className={linkClass} onClick={handleNavClick}>
+                      <Icon className={iconClass} />
                       <span className="truncate">{item.title}</span>
                       {typeof item.notifications === "number" && item.notifications > 0 ? (
-                        <SidebarMenuBadge className="bg-red-200 text-red-900">
+                        <SidebarMenuBadge className="bg-emerald-700 text-white font-semibold shadow-md hover:bg-emerald-800 transition-colors">
                           {item.notifications}
                         </SidebarMenuBadge>
                       ) : null}
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )

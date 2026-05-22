@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import type { LucideIcon } from "lucide-react"
 import Link from "next/link"
@@ -85,13 +86,21 @@ export function CorporateEmployeeSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname() || "/"
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/corporate_employee" className="flex items-center gap-3">
+              <Link href="/corporate_employee" className="flex items-center gap-3" onClick={handleNavClick}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-emerald-700 text-white">
                   <LayoutDashboardIcon className="size-4" />
                 </div>
@@ -118,7 +127,7 @@ export function CorporateEmployeeSidebar({
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} className={linkClass}>
+                    <Link href={item.url} className={linkClass} onClick={handleNavClick}>
                       <Icon className={iconClass} />
                       <span>{item.title}</span>
                     </Link>
@@ -142,7 +151,7 @@ export function CorporateEmployeeSidebar({
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <Link href={item.url} className={linkClass}>
+                      <Link href={item.url} className={linkClass} onClick={handleNavClick}>
                         <Icon className={iconClass} />
                         <span>{item.title}</span>
                       </Link>

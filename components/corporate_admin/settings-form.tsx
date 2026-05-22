@@ -81,7 +81,7 @@ export function SettingsForm() {
           </div>
           
           <div className="flex justify-end pt-4 border-t border-slate-100">
-            <Button className="bg-slate-950 hover:bg-slate-800 text-white">
+            <Button className="bg-slate-950 hover:bg-slate-800 text-white" onClick={() => alert("Settings saved!")}>
               <SaveIcon className="mr-2 h-4 w-4" /> Save Changes
             </Button>
           </div>
@@ -95,7 +95,7 @@ export function SettingsForm() {
               <h3 className="text-lg font-semibold text-slate-900">User Management</h3>
               <p className="text-sm text-slate-500">Manage dashboard access and roles for your team.</p>
             </div>
-            <Button variant="outline">Invite User</Button>
+            <Button variant="outline" onClick={() => alert("Invite sent!")}>Invite User</Button>
           </div>
           <div className="text-center py-12 text-slate-500 border border-dashed border-slate-200 rounded-xl">
             User management table will appear here.
@@ -110,7 +110,7 @@ export function SettingsForm() {
               <h3 className="text-lg font-semibold text-slate-900">Approval Workflows</h3>
               <p className="text-sm text-slate-500">Define multi-step approval chains for large transactions.</p>
             </div>
-            <Button variant="outline">Create Workflow</Button>
+            <Button variant="outline" onClick={() => alert("Workflow builder opened!")}>Create Workflow</Button>
           </div>
           <div className="text-center py-12 text-slate-500 border border-dashed border-slate-200 rounded-xl">
             Drag-and-drop workflow builder will appear here.
@@ -139,7 +139,7 @@ export function SettingsForm() {
               <h3 className="text-lg font-semibold text-slate-900">API & ERP Integrations</h3>
               <p className="text-sm text-slate-500">Manage API keys and webhooks for your internal tools.</p>
             </div>
-            <Button variant="outline">Generate API Key</Button>
+            <Button variant="outline" onClick={() => alert("API key generated!")}>Generate API Key</Button>
           </div>
           <div className="text-center py-12 text-slate-500 border border-dashed border-slate-200 rounded-xl">
             ERP webhook configuration will appear here.

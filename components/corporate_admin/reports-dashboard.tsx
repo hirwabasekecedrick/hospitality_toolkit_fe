@@ -68,7 +68,7 @@ export function ReportsDashboard() {
           <Button onClick={handleExportExcel} className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto">
             <FileSpreadsheetIcon className="mr-2 h-4 w-4" /> Export Excel
           </Button>
-          <Button variant="outline" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto" onClick={() => alert("PDF report downloaded!")}>
             <DownloadIcon className="mr-2 h-4 w-4" /> Export PDF
           </Button>
         </div>

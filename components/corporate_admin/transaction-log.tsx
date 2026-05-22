@@ -162,8 +162,8 @@ export function TransactionLog() {
                               <span>RWF {tx.amount.toLocaleString()}</span>
                             </div>
                             <div className="pt-2 flex justify-end gap-2">
-                              <Button size="sm" variant="outline" className="text-xs h-8">Download PDF</Button>
-                              <Button size="sm" variant="secondary" className="text-xs h-8 text-red-600 bg-red-50 hover:bg-red-100 border-none">Flag Dispute</Button>
+                              <Button size="sm" variant="outline" className="text-xs h-8 bg-emerald-700 text-white hover:bg-emerald-200">Download PDF</Button>
+                              {/* <Button size="sm" variant="secondary" className="text-xs h-8 text-red-600 bg-red-50 hover:bg-red-100 border-none">Flag Dispute</Button> */}
                             </div>
                           </div>
                         </div>

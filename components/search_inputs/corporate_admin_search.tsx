@@ -9,7 +9,7 @@ export function CorporateAdminSearch() {
       <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
       <Input
         placeholder="Search cards, transactions, hotels, approvals..."
-        className="pl-10 pr-4"
+        className="p-5 pl-10 pr-4 rounded-full"
       />
     </div>
   )

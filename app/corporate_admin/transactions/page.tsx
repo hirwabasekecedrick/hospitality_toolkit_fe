@@ -99,9 +99,9 @@ function TransactionItem({ transaction }: { transaction: TransactionRecord }) {
   const Icon = transaction.icon
 
   return (
-    <div className="flex items-center gap-3 border-b border-slate-200/80 bg-slate-60/70 p-4 transition hover:border-slate-300 sm:p-5">
-      <div className={`grid h-12 w-12 place-items-center rounded-2xl ${transaction.iconBg}`}>
-        <Icon className={`size-5 ${transaction.iconColor}`} />
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 border-b border-slate-200/80 bg-slate-60/70 p-4 transition hover:border-slate-300 sm:p-5">
+      <div className={`grid h-10 w-10 sm:h-12 sm:w-12 place-items-center rounded-2xl ${transaction.iconBg}`}>
+        <Icon className={`h-5 w-5 ${transaction.iconColor}`} />
       </div>
       <div className="min-w-0 flex-1 overflow-hidden">
         <p className="truncate text-sm font-semibold text-slate-950">
@@ -116,7 +116,7 @@ function TransactionItem({ transaction }: { transaction: TransactionRecord }) {
           {transaction.time} · {transaction.date}
         </p>
       </div>
-      <div className="shrink-0 text-right">
+      <div className="mt-3 sm:mt-0 shrink-0 text-right">
         <p className={`text-sm font-semibold ${transaction.amount < 0 ? "text-destructive" : "text-emerald-600"}`}>
           {formatTransactionAmount(transaction.amount, transaction.currency)}
         </p>
@@ -129,11 +129,11 @@ import { TransactionLog } from "@/components/corporate_admin/transaction-log"
 
 export default function Page() {
   return (
-    <div className="space-y-6">
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+    <div className="space-y-6 p-4 max-w-7xl mx-auto">
+      <div className="rounded-3xl bg-white">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold text-slate-950">Transactions</h1>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Transactions</h1>
             <p className="mt-1 text-sm text-slate-500">View and manage all corporate card transactions, including receipts and tax breakdowns.</p>
           </div>
         </div>

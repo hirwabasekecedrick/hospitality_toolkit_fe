@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { SearchIcon, Building2Icon, MapPinIcon, StarIcon, ExternalLinkIcon } from "lucide-react"
+import { SearchIcon, MapPinIcon, StarIcon, ExternalLinkIcon } from "lucide-react"
 
 const MOCK_HOTELS = [
   { id: "1", name: "Kigali Marriott Hotel", location: "KN 3 Ave, Kigali", rating: 5, status: "Integrated", negotiatedRate: "15% off Best Available" },
@@ -36,41 +36,46 @@ export function HotelsList() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-4">
         {filteredHotels.map(hotel => (
-          <div key={hotel.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                  <Building2Icon className="h-6 w-6" />
+          <div key={hotel.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group w-full">
+            <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+              <div className="flex-1">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">{hotel.name}</h3>
+                    <div className="flex items-center text-slate-500 mt-2 text-sm">
+                      <MapPinIcon className="h-4 w-4 mr-1" /> {hotel.location}
+                    </div>
+                  </div>
+                  <Badge className={hotel.status === 'Integrated' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
+                    {hotel.status}
+                  </Badge>
                 </div>
-                <Badge className={hotel.status === 'Integrated' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}>
-                  {hotel.status}
-                </Badge>
+
+                <div className="flex items-center text-amber-500 gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <StarIcon key={i} className={`h-4 w-4 ${i < hotel.rating ? 'fill-current' : 'text-slate-200'}`} />
+                  ))}
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{hotel.name}</h3>
-              <div className="flex items-center text-slate-500 mt-2 text-sm">
-                <MapPinIcon className="h-4 w-4 mr-1" /> {hotel.location}
-              </div>
-              <div className="flex items-center text-amber-500 mt-2">
-                {[...Array(5)].map((_, i) => (
-                  <StarIcon key={i} className={`h-4 w-4 ${i < hotel.rating ? 'fill-current' : 'text-slate-200'}`} />
-                ))}
+
+              <div className="min-w-[220px] rounded-3xl border border-slate-100 bg-slate-50 p-4">
+                <p className="text-sm font-medium text-slate-900 mb-1">Corporate Agreement</p>
+                <p className="text-sm text-slate-500">{hotel.negotiatedRate}</p>
               </div>
             </div>
-            
-            <div className="mt-6 pt-4 border-t border-slate-100">
-              <p className="text-sm font-medium text-slate-900 mb-1">Corporate Agreement</p>
-              <p className="text-sm text-slate-500">{hotel.negotiatedRate}</p>
-              <Button variant="ghost" className="w-full mt-4 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+
+            <div className="mt-4 border-t border-slate-100 pt-4">
+              <Button variant="ghost" className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => alert("Loading hotel details...")}>
                 View Details <ExternalLinkIcon className="h-4 w-4 ml-2" />
               </Button>
             </div>
           </div>
         ))}
         {filteredHotels.length === 0 && (
-          <div className="col-span-full py-12 text-center bg-white rounded-2xl border border-slate-200 border-dashed">
-            <Building2Icon className="h-8 w-8 text-slate-300 mx-auto mb-3" />
+          <div className="py-12 text-center bg-white rounded-2xl border border-slate-200 border-dashed">
+            <MapPinIcon className="h-8 w-8 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500">No partner hotels found matching your search.</p>
           </div>
         )}

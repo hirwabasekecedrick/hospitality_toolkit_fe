@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import type { LucideIcon } from "lucide-react"
 import {
@@ -82,13 +83,21 @@ const data: { navMain: NavItem[] } = {
 }
 
 export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href={DIRECTORY}>
+              <a href={DIRECTORY} onClick={handleNavClick}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <GalleryVerticalEndIcon className="size-4" />
                 </div>
@@ -110,11 +119,11 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton className="hover:bg-blue-200" asChild>
-                    <a href={item.url} className="flex items-center gap-2 font-semibold m-2">
+                    <a href={item.url} className="flex items-center gap-2 font-semibold m-2" onClick={handleNavClick}>
                       <Icon className="size-4 shrink-0 text-sidebar-foreground" />
                       <span className="truncate">{item.title}</span>
                       {typeof item.notifications === "number" && item.notifications > 0 ? (
-                        <SidebarMenuBadge className="bg-red-200 text-red-900">
+                        <SidebarMenuBadge className="bg-emerald-700 text-white font-semibold shadow-md hover:bg-emerald-800 transition-colors">
                           {item.notifications}
                         </SidebarMenuBadge>
                       ) : null}

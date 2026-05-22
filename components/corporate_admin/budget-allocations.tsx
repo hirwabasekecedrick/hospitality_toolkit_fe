@@ -1,31 +1,16 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Slider } from "@/components/ui/slider"
 import { GripVerticalIcon, WalletIcon, BuildingIcon, CreditCardIcon, AlertTriangleIcon } from "lucide-react"
+import { getBudgets, subscribeBudgets, type Budget } from "@/lib/budgetStore"
+import Link from "next/link"
 
-interface BudgetItem {
-  id: string
-  name: string
-  type: "department" | "card"
-  allocated: number
-  spent: number
-  ceiling: number
-}
-
-const INITIAL_ITEMS: BudgetItem[] = [
-  { id: "dept-1", name: "Marketing", type: "department", allocated: 2000000, spent: 1500000, ceiling: 2000000 },
-  { id: "dept-2", name: "Sales", type: "department", allocated: 3000000, spent: 1200000, ceiling: 3000000 },
-  { id: "card-1", name: "Jane Doe (Travel)", type: "card", allocated: 500000, spent: 480000, ceiling: 500000 },
-  { id: "card-2", name: "IT Infrastructure", type: "card", allocated: 1500000, spent: 200000, ceiling: 1500000 },
-]
-
-function SortableBudgetItem({ item }: { item: BudgetItem }) {
+function SortableBudgetItem({ item }: { item: Budget }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id })
 
   const style = {
@@ -33,7 +18,7 @@ function SortableBudgetItem({ item }: { item: BudgetItem }) {
     transition,
   }
 
-  const progressPercentage = (item.spent / item.allocated) * 100
+  const progressPercentage = item.allocated ? (item.spent / item.allocated) * 100 : 0
   const isNearCeiling = progressPercentage > 85
 
   return (
@@ -43,12 +28,22 @@ function SortableBudgetItem({ item }: { item: BudgetItem }) {
           <div {...attributes} {...listeners} className="cursor-grab text-slate-400 hover:text-slate-600 active:cursor-grabbing">
             <GripVerticalIcon className="h-5 w-5" />
           </div>
-          <div className={`p-2 rounded-lg ${item.type === 'department' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
-            {item.type === 'department' ? <BuildingIcon className="h-4 w-4" /> : <CreditCardIcon className="h-4 w-4" />}
+          <div className={`p-2 rounded-lg ${item.allocationType === 'department' ? 'bg-blue-50 text-blue-600' : item.allocationType === 'card' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-700'}`}>
+            {item.allocationType === 'department' ? (
+              <BuildingIcon className="h-4 w-4" />
+            ) : item.allocationType === 'card' ? (
+              <CreditCardIcon className="h-4 w-4" />
+            ) : (
+              <WalletIcon className="h-4 w-4" />
+            )}
           </div>
           <div>
-            <h4 className="font-semibold text-slate-900">{item.name}</h4>
-            <p className="text-xs text-slate-500 uppercase tracking-wider">{item.type}</p>
+            <h4 className="font-semibold text-slate-900">
+              <Link href={`/corporate_admin/budget/${item.id}`} className="hover:text-emerald-700 transition">
+                {item.name}
+              </Link>
+            </h4>
+            <p className="text-xs text-slate-500 uppercase tracking-wider">{item.allocationType}</p>
           </div>
         </div>
         <div className="text-right">
@@ -83,8 +78,13 @@ function SortableBudgetItem({ item }: { item: BudgetItem }) {
 }
 
 export function BudgetAllocations() {
-  const [items, setItems] = useState(INITIAL_ITEMS)
-  
+  const [items, setItems] = useState<Budget[]>(() => getBudgets())
+
+  useEffect(() => {
+    const unsubscribe = subscribeBudgets(() => setItems(getBudgets()))
+    return unsubscribe
+  }, [])
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -144,7 +144,7 @@ export function BudgetAllocations() {
             <h3 className="text-lg font-semibold text-slate-900">Budget Hierarchy</h3>
             <p className="text-sm text-slate-500">Drag to reorder hierarchy or adjust sliders to reallocate budget.</p>
           </div>
-          <Button variant="outline">Save Layout</Button>
+          <Button variant="outline" onClick={() => alert("Layout saved successfully!")}>Save Layout</Button>
         </div>
         
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

@@ -1,26 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontalIcon, CreditCardIcon, BanIcon, Edit2Icon, RefreshCcwIcon } from "lucide-react"
 
-// Mock Data
-const MOCK_CARDS = [
-  { id: "1", type: "Physical", cardholder: "John Doe", last4: "4321", status: "Active", limit: "RWF 500,000", lastUsed: "Today" },
-  { id: "2", type: "Virtual", cardholder: "Marketing Dept", last4: "8765", status: "Active", limit: "RWF 2,000,000", lastUsed: "Yesterday" },
-  { id: "3", type: "Physical", cardholder: "Jane Smith", last4: "1122", status: "Suspended", limit: "RWF 1,000,000", lastUsed: "3 days ago" },
-  { id: "4", type: "Virtual", cardholder: "IT Infrastructure", last4: "9988", status: "Active", limit: "RWF 5,000,000", lastUsed: "Last week" },
-  { id: "5", type: "Physical", cardholder: "Michael Johnson", last4: "5544", status: "Cancelled", limit: "RWF 0", lastUsed: "1 month ago" },
-]
+import { getCards, subscribe, type Card } from "@/lib/cardsStore"
 
 export function CardsTable() {
+  const router = useRouter()
   const [filterType, setFilterType] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
 
-  const filteredCards = MOCK_CARDS.filter(card => {
+  const [cards, setCards] = useState<Card[]>(() => getCards())
+
+  useEffect(() => {
+    const unsub = subscribe(() => setCards(getCards()))
+    return unsub
+  }, [])
+
+  const filteredCards = cards.filter((card) => {
     if (filterType !== "all" && card.type.toLowerCase() !== filterType) return false
     if (filterStatus !== "all" && card.status.toLowerCase() !== filterStatus) return false
     return true
@@ -70,7 +73,11 @@ export function CardsTable() {
             </thead>
             <tbody className="divide-y divide-slate-200">
               {filteredCards.map((card) => (
-                <tr key={card.id} className="hover:bg-slate-50 transition-colors">
+                <tr 
+                  key={card.id} 
+                  className="hover:bg-slate-50 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/corporate_admin/cards/${card.id}`)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
@@ -114,24 +121,54 @@ export function CardsTable() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem 
+                          className="cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toast.success(`Update limits clicked for ${card.cardholder}'s card`);
+                          }}
+                        >
                           <Edit2Icon className="mr-2 h-4 w-4" /> Update limits
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem 
+                          className="cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toast.success(`Viewing transactions for ${card.cardholder}'s card`);
+                          }}
+                        >
                           <RefreshCcwIcon className="mr-2 h-4 w-4" /> View transactions
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         {card.status === "Active" ? (
-                          <DropdownMenuItem className="cursor-pointer text-orange-600 focus:bg-orange-50 focus:text-orange-700">
+                          <DropdownMenuItem 
+                            className="cursor-pointer text-orange-600 focus:bg-orange-50 focus:text-orange-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toast.success(`Suspended ${card.cardholder}'s card`);
+                            }}
+                          >
                             <BanIcon className="mr-2 h-4 w-4" /> Suspend card
                           </DropdownMenuItem>
                         ) : card.status === "Suspended" ? (
-                          <DropdownMenuItem className="cursor-pointer text-emerald-600 focus:bg-emerald-50 focus:text-emerald-700">
+                          <DropdownMenuItem 
+                            className="cursor-pointer text-emerald-600 focus:bg-emerald-50 focus:text-emerald-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toast.success(`Reactivated ${card.cardholder}'s card`);
+                            }}
+                          >
                             <RefreshCcwIcon className="mr-2 h-4 w-4" /> Reactivate card
                           </DropdownMenuItem>
                         ) : null}
                         {card.status !== "Cancelled" && (
-                          <DropdownMenuItem className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700">
+                          <DropdownMenuItem 
+                            className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toast.success(`Cancelled ${card.cardholder}'s card`);
+                            }}
+                          >
                             <BanIcon className="mr-2 h-4 w-4" /> Cancel card
                           </DropdownMenuItem>
                         )}
