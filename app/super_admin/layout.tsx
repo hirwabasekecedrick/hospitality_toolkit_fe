@@ -1,6 +1,6 @@
 "use client"
 
-import { AppSidebar } from "@/components/app-sidebar"
+import { SuperAdminSidebar } from "@/components/sidebars/super_admin/SuperAdminSidebar"
 import { SuperAdminHeader } from "@/components/headers/super_admin_header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import React from "react"
@@ -12,7 +12,7 @@ export default function SuperAdminLayout({
 }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <SuperAdminSidebar />
       <SidebarInset>
         <SuperAdminHeader />
         <div className="flex flex-1 flex-col gap-4 p-3 sm:p-4">

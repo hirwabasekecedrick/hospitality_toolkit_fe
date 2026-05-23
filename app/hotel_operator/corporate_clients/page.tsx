@@ -5,7 +5,6 @@ export default function Page() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Corporate Clients</h1>
-            <p className="mt-2 text-sm text-slate-500">Manage negotiated rates and track corporate spend.</p>
           </div>
           <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 w-full sm:w-auto">
             Add Client Rate

@@ -32,10 +32,18 @@ export default function Page() {
   const [isAddingAccount, setIsAddingAccount] = React.useState(false)
   const [editingAccountId, setEditingAccountId] = React.useState<string | null>(null)
   const nextIdRef = React.useRef(1)
-  const [formData, setFormData] = React.useState({
+  type BankAccountForm = {
+    accountHolderName: string
+    bankName: string
+    accountType: "checking" | "savings"
+    accountNumber: string
+    routingSwiftCode: string
+    taxId: string
+  }
+  const [formData, setFormData] = React.useState<BankAccountForm>({
     accountHolderName: "",
     bankName: "",
-    accountType: "checking" as const,
+    accountType: "checking",
     accountNumber: "",
     routingSwiftCode: "",
     taxId: "",
@@ -44,10 +52,135 @@ export default function Page() {
   const [transactionCountThreshold, setTransactionCountThreshold] = React.useState(10)
   const [apiBaseUrl, setApiBaseUrl] = React.useState("")
   const [apiPrimaryColor, setApiPrimaryColor] = React.useState("#10b981")
+  const [apiPrimaryColorInput, setApiPrimaryColorInput] = React.useState("#10b981")
   const [apiSecondaryColor, setApiSecondaryColor] = React.useState("#f8fafc")
+  const [apiSecondaryColorInput, setApiSecondaryColorInput] = React.useState("#f8fafc")
   const [apiAccentColor, setApiAccentColor] = React.useState("#1d4ed8")
+  const [apiAccentColorInput, setApiAccentColorInput] = React.useState("#1d4ed8")
   const [apiFontFamily, setApiFontFamily] = React.useState("Inter, sans-serif")
   const [apiBorderSize, setApiBorderSize] = React.useState("1")
+  const [apiPreviewMode, setApiPreviewMode] = React.useState<"light" | "dark">("light")
+  const [colorErrors, setColorErrors] = React.useState<{ primary?: string; secondary?: string; accent?: string }>({})
+  const [hotelName, setHotelName] = React.useState("")
+  const [hotelCode, setHotelCode] = React.useState("")
+  const [hotelLocation, setHotelLocation] = React.useState("")
+  const [hotelLogoUrl, setHotelLogoUrl] = React.useState("")
+  const [hotelLogoFile, setHotelLogoFile] = React.useState<File | null>(null)
+  const [hotelLogoPreview, setHotelLogoPreview] = React.useState("")
+  const [hotelStarRating, setHotelStarRating] = React.useState(4)
+
+  const securityLogs = [
+    {
+      id: "1",
+      event: "Signed in",
+      detail: "User logged in to the hotel operator dashboard.",
+      time: "May 23, 2026 09:12 AM",
+    },
+    {
+      id: "2",
+      event: "Updated settings",
+      detail: "Changed API integration styling and bank account details.",
+      time: "May 23, 2026 10:03 AM",
+    },
+    {
+      id: "3",
+      event: "Uploaded logo",
+      detail: "Updated hotel logo image in general settings.",
+      time: "May 23, 2026 11:28 AM",
+    },
+    {
+      id: "4",
+      event: "Saved hotel identity",
+      detail: "Updated hotel name, code, and star rating.",
+      time: "May 23, 2026 12:45 PM",
+    },
+  ]
+
+  React.useEffect(() => {
+    if (!hotelLogoFile) {
+      setHotelLogoPreview("")
+      return
+    }
+
+    const url = URL.createObjectURL(hotelLogoFile)
+    setHotelLogoPreview(url)
+
+    return () => {
+      URL.revokeObjectURL(url)
+    }
+  }, [hotelLogoFile])
+
+  const isValidHex = (value: string) => {
+    const raw = value.trim().replace(/^#/, "")
+    return /^[0-9A-Fa-f]{3}$/.test(raw) || /^[0-9A-Fa-f]{4}$/.test(raw) || /^[0-9A-Fa-f]{6}$/.test(raw) || /^[0-9A-Fa-f]{8}$/.test(raw)
+  }
+
+  const normalizeHex = (value: string) => {
+    const raw = value.trim().replace(/^#/, "")
+    return raw ? `#${raw}` : ""
+  }
+
+  const handleColorPickerChange = (key: "primary" | "secondary" | "accent", value: string) => {
+    const normalized = normalizeHex(value)
+    if (key === "primary") {
+      setApiPrimaryColor(normalized)
+      setApiPrimaryColorInput(normalized)
+      setColorErrors((prev) => ({ ...prev, primary: "" }))
+    }
+    if (key === "secondary") {
+      setApiSecondaryColor(normalized)
+      setApiSecondaryColorInput(normalized)
+      setColorErrors((prev) => ({ ...prev, secondary: "" }))
+    }
+    if (key === "accent") {
+      setApiAccentColor(normalized)
+      setApiAccentColorInput(normalized)
+      setColorErrors((prev) => ({ ...prev, accent: "" }))
+    }
+  }
+
+  const handleColorTextChange = (key: "primary" | "secondary" | "accent", value: string) => {
+    if (key === "primary") {
+      setApiPrimaryColorInput(value)
+      setColorErrors((prev) => ({ ...prev, primary: "" }))
+    }
+    if (key === "secondary") {
+      setApiSecondaryColorInput(value)
+      setColorErrors((prev) => ({ ...prev, secondary: "" }))
+    }
+    if (key === "accent") {
+      setApiAccentColorInput(value)
+      setColorErrors((prev) => ({ ...prev, accent: "" }))
+    }
+  }
+
+  const handleColorTextBlur = (key: "primary" | "secondary" | "accent") => {
+    const currentValue =
+      key === "primary"
+        ? apiPrimaryColorInput
+        : key === "secondary"
+        ? apiSecondaryColorInput
+        : apiAccentColorInput
+
+    if (isValidHex(currentValue)) {
+      const normalized = normalizeHex(currentValue)
+      if (key === "primary") {
+        setApiPrimaryColor(normalized)
+        setApiPrimaryColorInput(normalized)
+      }
+      if (key === "secondary") {
+        setApiSecondaryColor(normalized)
+        setApiSecondaryColorInput(normalized)
+      }
+      if (key === "accent") {
+        setApiAccentColor(normalized)
+        setApiAccentColorInput(normalized)
+      }
+      setColorErrors((prev) => ({ ...prev, [key]: "" }))
+    } else {
+      setColorErrors((prev) => ({ ...prev, [key]: "Enter a valid hex code like #0ea5e9" }))
+    }
+  }
 
   const saveSchedule = () => {
     const payload = { frequency, custom, transactionThresholdEnabled, transactionCountThreshold }
@@ -68,6 +201,25 @@ export default function Page() {
       alert("API integration settings saved")
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  const saveGeneralSettings = () => {
+    try {
+      localStorage.setItem(
+        "hotel_general_settings",
+        JSON.stringify({ hotelName, hotelCode, hotelLocation, hotelLogoUrl, hotelStarRating })
+      )
+      alert("General hotel settings saved")
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setHotelLogoFile(file)
     }
   }
 
@@ -159,7 +311,6 @@ export default function Page() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Settings</h1>
-            <p className="mt-2 text-sm text-slate-500">Configure property details, bank accounts, and user access.</p>
           </div>
         </div>
 
@@ -169,11 +320,110 @@ export default function Page() {
               <TabsTrigger value="general">General</TabsTrigger>
               <TabsTrigger value="payments">Payments</TabsTrigger>
               <TabsTrigger value="redeems">Redeems</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
             </TabsList>
 
             <TabsContent value="general">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <p className="text-sm font-medium text-slate-500">General property settings appear here.</p>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-950">Hotel identity</h2>
+                  </div>
+                  <button onClick={saveGeneralSettings} className="rounded-md bg-emerald-700 text-white px-4 py-2 text-sm">
+                    Save general settings
+                  </button>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Hotel name</label>
+                    <input
+                      type="text"
+                      value={hotelName}
+                      onChange={(e) => setHotelName(e.target.value)}
+                      placeholder="e.g. Grand Horizon Hotel"
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={hotelLocation}
+                      onChange={(e) => setHotelLocation(e.target.value)}
+                      placeholder="e.g. Downtown, San Francisco"
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Star rating</label>
+                    <select
+                      value={hotelStarRating}
+                      onChange={(e) => setHotelStarRating(Number(e.target.value))}
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    >
+                      {[5, 4, 3, 2, 1].map((rating) => (
+                        <option key={rating} value={rating}>{rating} Star{rating > 1 ? "s" : ""}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Hotel logo URL</label>
+                    <input
+                      type="text"
+                      value={hotelLogoUrl}
+                      onChange={(e) => setHotelLogoUrl(e.target.value)}
+                      placeholder="https://example.com/logo.png"
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Upload logo file</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoFileChange}
+                      className="w-full text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-950">Hotel preview</p>
+                      <p className="text-xs text-slate-500">Logo loaded from URL or file selected above.</p>
+                    </div>
+                    <div className="inline-flex items-center gap-2 text-sm text-slate-600">
+                      <span>{hotelStarRating} Star{hotelStarRating > 1 ? "s" : ""}</span>
+                      <span className="flex items-center gap-1">
+                        {Array.from({ length: 5 }, (_, index) => (
+                          <span key={index} className={index < hotelStarRating ? "text-amber-500" : "text-slate-300"}>★</span>
+                        ))}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="h-28 w-28 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                      {hotelLogoPreview ? (
+                        <img src={hotelLogoPreview} alt="Hotel logo preview" className="h-full w-full object-contain" />
+                      ) : hotelLogoUrl ? (
+                        <img src={hotelLogoUrl} alt="Hotel logo preview" className="h-full w-full object-contain" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-sm text-slate-500">No logo</div>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-slate-950">{hotelName || "Hotel name not set"}</p>
+                      <p className="text-sm text-slate-500">{hotelCode ? `Code: ${hotelCode}` : "Hotel code not set"}</p>
+                      <p className="text-sm text-slate-500">{hotelLocation || "Location not set"}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
@@ -383,30 +633,69 @@ export default function Page() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Primary color</label>
-                      <input
-                        type="color"
-                        value={apiPrimaryColor}
-                        onChange={(e) => setApiPrimaryColor(e.target.value)}
-                        className="h-10 w-full rounded-md border border-slate-300 p-1"
-                      />
+                      <div className="grid gap-2 sm:grid-cols-[auto_1fr]">
+                        <input
+                          type="color"
+                          value={apiPrimaryColor}
+                          onChange={(e) => handleColorPickerChange("primary", e.target.value)}
+                          className="h-10 w-full rounded-md border border-slate-300 p-1"
+                        />
+                        <input
+                          type="text"
+                          value={apiPrimaryColorInput}
+                          onChange={(e) => handleColorTextChange("primary", e.target.value)}
+                          onBlur={() => handleColorTextBlur("primary")}
+                          placeholder="#10b981"
+                          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <p className={`mt-1 text-xs ${colorErrors.primary ? "text-rose-600" : "text-slate-500"}`}>
+                        {colorErrors.primary || "Paste a hex code or choose a color."}
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Secondary color</label>
-                      <input
-                        type="color"
-                        value={apiSecondaryColor}
-                        onChange={(e) => setApiSecondaryColor(e.target.value)}
-                        className="h-10 w-full rounded-md border border-slate-300 p-1"
-                      />
+                      <div className="grid gap-2 sm:grid-cols-[auto_1fr]">
+                        <input
+                          type="color"
+                          value={apiSecondaryColor}
+                          onChange={(e) => handleColorPickerChange("secondary", e.target.value)}
+                          className="h-10 w-full rounded-md border border-slate-300 p-1"
+                        />
+                        <input
+                          type="text"
+                          value={apiSecondaryColorInput}
+                          onChange={(e) => handleColorTextChange("secondary", e.target.value)}
+                          onBlur={() => handleColorTextBlur("secondary")}
+                          placeholder="#f8fafc"
+                          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <p className={`mt-1 text-xs ${colorErrors.secondary ? "text-rose-600" : "text-slate-500"}`}>
+                        {colorErrors.secondary || "Paste a hex code or choose a color."}
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Accent color</label>
-                      <input
-                        type="color"
-                        value={apiAccentColor}
-                        onChange={(e) => setApiAccentColor(e.target.value)}
-                        className="h-10 w-full rounded-md border border-slate-300 p-1"
-                      />
+                      <div className="grid gap-2 sm:grid-cols-[auto_1fr]">
+                        <input
+                          type="color"
+                          value={apiAccentColor}
+                          onChange={(e) => handleColorPickerChange("accent", e.target.value)}
+                          className="h-10 w-full rounded-md border border-slate-300 p-1"
+                        />
+                        <input
+                          type="text"
+                          value={apiAccentColorInput}
+                          onChange={(e) => handleColorTextChange("accent", e.target.value)}
+                          onBlur={() => handleColorTextBlur("accent")}
+                          placeholder="#1d4ed8"
+                          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <p className={`mt-1 text-xs ${colorErrors.accent ? "text-rose-600" : "text-slate-500"}`}>
+                        {colorErrors.accent || "Paste a hex code or choose a color."}
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Border size (px)</label>
@@ -421,17 +710,40 @@ export default function Page() {
                   </div>
 
                   <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
-                    <h3 className="text-sm font-semibold text-slate-950">Preview</h3>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="text-sm font-semibold text-slate-950">Preview</h3>
+                        <p className="text-xs text-slate-500">Switch between light and dark preview styles.</p>
+                      </div>
+                      <div className="inline-flex rounded-full border border-slate-200 bg-slate-100 p-1 text-slate-600">
+                        <button
+                          type="button"
+                          onClick={() => setApiPreviewMode("light")}
+                          className={`rounded-full px-3 py-1 text-sm ${apiPreviewMode === "light" ? "bg-emerald-700 text-white" : "text-slate-700"}`}
+                        >
+                          Light
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setApiPreviewMode("dark")}
+                          className={`rounded-full px-3 py-1 text-sm ${apiPreviewMode === "dark" ? "bg-emerald-700 text-white" : "text-slate-700"}`}
+                        >
+                          Dark
+                        </button>
+                      </div>
+                    </div>
+
                     <div
                       style={{
-                        background: apiSecondaryColor,
-                        color: apiPrimaryColor,
+                        background: apiPreviewMode === "dark" ? "#0f172a" : apiSecondaryColor,
+                        color: apiPreviewMode === "dark" ? "#f8fafc" : apiPrimaryColor,
                         border: `${apiBorderSize}px solid ${apiAccentColor}`,
                         fontFamily: apiFontFamily,
                       }}
-                      className="mt-3 rounded-xl p-4"
+                      className={`mt-4 rounded-xl p-5 ${apiPreviewMode === "dark" ? "shadow-lg shadow-slate-950/20" : "shadow-sm shadow-slate-200"}`}
                     >
-                      <p className="text-sm">API component preview text uses your selected palette, font, and border size.</p>
+                      <p className="text-sm font-semibold">API component preview</p>
+                      
                     </div>
                   </div>
                 </div>
@@ -441,7 +753,6 @@ export default function Page() {
             <TabsContent value="redeems">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
                 <h2 className="text-lg font-semibold">Redeem schedule</h2>
-                <p className="mt-1 text-sm text-slate-500">Configure how often the system attempts to redeem payments to your account.</p>
 
                 <div className="mt-4 space-y-3">
                   <label className="flex items-center gap-3">
@@ -508,6 +819,30 @@ export default function Page() {
                   <div className="mt-4">
                     <button onClick={saveSchedule} className="rounded-md bg-emerald-700 text-white px-4 py-2">Save schedule</button>
                   </div>
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="security">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-950">Security activity logs</h2>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {securityLogs.map((log) => (
+                    <div key={log.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-slate-950">{log.event}</p>
+                          <p className="mt-1 text-sm text-slate-500">{log.detail}</p>
+                        </div>
+                        <div className="text-sm text-slate-500">
+                          <p className="font-medium text-slate-900">{log.time}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </TabsContent>

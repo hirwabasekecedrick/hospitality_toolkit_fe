@@ -134,7 +134,6 @@ export default function Page() {
       <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Transactions</h1>
-          <p className="mt-2 text-sm text-slate-500">View and manage all transactions processed at your property.</p>
         </div>
         <div className="mt-6">
           <TransactionsOverview />

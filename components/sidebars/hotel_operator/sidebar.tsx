@@ -15,8 +15,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import type { LucideIcon } from "lucide-react"
+import Image from "next/image"
 import {
-  GalleryVerticalEndIcon,
   LayoutDashboardIcon,
   CreditCardIcon,
   ArrowRightLeftIcon,
@@ -97,14 +97,16 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href={DIRECTORY} onClick={handleNavClick}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <GalleryVerticalEndIcon className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-bold">yoGuide</span>
-                  <span className="text-xs text-muted-foreground">Hotel Operator Portal</span>
+            <SidebarMenuButton size="lg" className="p-0" asChild>
+              <a href={DIRECTORY} onClick={handleNavClick} className="block w-full px-4 py-4">
+                <div className="mx-auto h-14 w-full max-w-[180px]">
+                  <Image
+                    src="/images/sidebar_logo.png"
+                    alt="Sidebar logo"
+                    width={180}
+                    height={56}
+                    className="h-full w-full object-contain"
+                  />
                 </div>
               </a>
             </SidebarMenuButton>

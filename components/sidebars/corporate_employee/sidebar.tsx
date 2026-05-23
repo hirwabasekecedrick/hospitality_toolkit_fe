@@ -15,6 +15,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import type { LucideIcon } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -101,8 +102,8 @@ export function CorporateEmployeeSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/corporate_employee" className="flex items-center gap-3" onClick={handleNavClick}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-emerald-700 text-white">
-                  <LayoutDashboardIcon className="size-4" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} className="rounded-md object-cover" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-bold">yoGuide</span>

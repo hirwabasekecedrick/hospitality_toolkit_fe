@@ -5,7 +5,6 @@ export default function Page() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Disputes</h1>
-            <p className="mt-2 text-sm text-slate-500">Manage flagged transactions and communicate with corporate admins.</p>
           </div>
         </div>
         <div className="mt-8">
