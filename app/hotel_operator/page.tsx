@@ -67,7 +67,7 @@ export default function Page() {
           </div>
           <div className="flex flex-wrap gap-3">
             <a href="/hotel_operator/transactions" className="rounded-full w-full sm:w-auto bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 flex items-center justify-center">
-              <QrCodeIcon className="mr-2 inline h-4 w-4" /> Process Payment
+              <QrCodeIcon className="mr-2 inline h-4  w-4" /> Process Payment
             </a>
             <a href="/hotel_operator/revenue_reports" className="rounded-full w-full sm:w-auto border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 flex items-center justify-center">
               <DownloadIcon className="mr-2 inline h-4 w-4" /> Export Report

@@ -25,6 +25,7 @@ import {
   AlertCircleIcon,
   PieChartIcon,
   SettingsIcon,
+  GiftIcon,
 } from "lucide-react"
 
 interface NavItem {
@@ -70,9 +71,9 @@ const data: { navMain: NavItem[] } = {
       notifications: 2,
     },
     {
-      title: "VAT reports",
-      url: `${DIRECTORY}/vat_reports`,
-      icon: PieChartIcon,
+      title: "Redeems",
+      url: `${DIRECTORY}/redeems`,
+      icon: GiftIcon,
     },
     {
       title: "Settings",

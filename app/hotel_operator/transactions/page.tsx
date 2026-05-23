@@ -130,7 +130,7 @@ export function TransactionsOverview() {
 
 export default function Page() {
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-0">
+    <div className="space-y-6  px-0">
       <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
         <div>
           <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Transactions</h1>
