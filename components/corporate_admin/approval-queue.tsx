@@ -42,9 +42,7 @@ export function ApprovalQueue() {
               {/* Request Info */}
               <div className="flex-1 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-slate-50 text-slate-600 font-medium">
-                    {item.type}
-                  </Badge>
+                 
                   <span className="text-xs text-slate-400 flex items-center gap-1">
                     <ClockIcon className="h-3 w-3" /> {item.dateRequested}
                   </span>

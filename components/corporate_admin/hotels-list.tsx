@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { SearchIcon, MapPinIcon, StarIcon, ExternalLinkIcon } from "lucide-react"
 
 const MOCK_HOTELS = [
@@ -14,28 +15,90 @@ const MOCK_HOTELS = [
   { id: "5", name: "Mantis Epic Hotel", location: "Nyagatare", rating: 4, status: "Integrated", negotiatedRate: "Standard Corporate" },
 ]
 
+const UNIQUE_LOCATIONS = Array.from(new Set(MOCK_HOTELS.map(hotel => hotel.location)))
+const UNIQUE_STATUSES = Array.from(new Set(MOCK_HOTELS.map(hotel => hotel.status)))
+
 export function HotelsList() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [locationFilter, setLocationFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [sortOrder, setSortOrder] = useState("rating_desc")
 
-  const filteredHotels = MOCK_HOTELS.filter(hotel => 
-    hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    hotel.location.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredHotels = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase()
+
+    return MOCK_HOTELS.filter((hotel) => {
+      const matchesSearch =
+        normalizedSearch === "" ||
+        hotel.name.toLowerCase().includes(normalizedSearch) ||
+        hotel.location.toLowerCase().includes(normalizedSearch) ||
+        hotel.status.toLowerCase().includes(normalizedSearch) ||
+        hotel.negotiatedRate.toLowerCase().includes(normalizedSearch)
+
+      const matchesLocation = locationFilter === "all" || hotel.location === locationFilter
+      const matchesStatus = statusFilter === "all" || hotel.status === statusFilter
+
+      return matchesSearch && matchesLocation && matchesStatus
+    }).sort((a, b) => {
+      if (sortOrder === "rating_asc") {
+        return a.rating - b.rating || a.name.localeCompare(b.name)
+      }
+      if (sortOrder === "rating_desc") {
+        return b.rating - a.rating || a.name.localeCompare(b.name)
+      }
+      return a.name.localeCompare(b.name)
+    })
+  }, [searchTerm, locationFilter, statusFilter, sortOrder])
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div className="relative w-full max-w-sm">
+      <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[1.7fr_1.3fr] lg:grid-cols-[1.8fr_2.2fr]">
+        <div className="relative">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Search by hotel name or location..." 
+          <Input
+            placeholder="Search by hotel name, location, status or rate"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-9 bg-slate-50 border-slate-200"
           />
         </div>
-      </div>
 
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All locations" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All locations</SelectItem>
+              {UNIQUE_LOCATIONS.map((location) => (
+                <SelectItem key={location} value={location}>{location}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              {UNIQUE_STATUSES.map((status) => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sort by rating" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="rating_desc">Rating: High to Low</SelectItem>
+              <SelectItem value="rating_asc">Rating: Low to High</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       <div className="space-y-4">
         {filteredHotels.map(hotel => (
           <div key={hotel.id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group w-full">

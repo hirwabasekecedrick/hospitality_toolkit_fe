@@ -39,7 +39,6 @@ export function CardsTable() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="physical">Physical</SelectItem>
             <SelectItem value="virtual">Virtual</SelectItem>
           </SelectContent>
         </Select>

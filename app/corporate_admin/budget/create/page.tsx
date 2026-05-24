@@ -65,7 +65,7 @@ export default function CreateBudgetPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-3xl bg-white p-6">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">

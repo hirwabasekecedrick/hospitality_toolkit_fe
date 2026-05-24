@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import { StatCard } from "@/src/components/superadmin/StatCard";
 import { mockStats, mockSystemHealth } from "@/src/mocks/superAdminData";

@@ -24,15 +24,15 @@ const statusCards: StatusCard[] = [
     icon: <TrendingUpIcon className="h-5 w-5 text-emerald-600" />,
   },
   {
-    label: "Spend MTD",
+    label: "Spend",
     value: "RWF 3.1M",
     detail: "62% of budget used",
     icon: <CreditCardIcon className="h-5 w-5 text-emerald-600" />,
   },
   {
-    label: "Active cards",
+    label: "Active cards Now",
     value: "12",
-    detail: "9 physical · 3 virtual",
+    detail: "",
     icon: <CreditCardIcon className="h-5 w-5 text-emerald-600" />,
   },
   {
@@ -59,7 +59,7 @@ function StatusCard({ card }: { card: StatusCard }) {
 export default function Page() {
   return (
     <div className="space-y-6  px-0">
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-3xl bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
            
@@ -83,7 +83,7 @@ export default function Page() {
       </div>
 
       <div className="">
-        <div className="space-y-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="space-y-4 rounded-3xl bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-base font-semibold text-slate-900">Recent activity</p>
@@ -103,7 +103,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="space-y-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="space-y-4 rounded-3xl bg-white p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-base font-semibold text-slate-900">Pending approvals</p>

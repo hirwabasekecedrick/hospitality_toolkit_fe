@@ -129,7 +129,7 @@ import { TransactionLog } from "@/components/corporate_admin/transaction-log"
 
 export default function Page() {
   return (
-    <div className="space-y-6 p-4 max-w-7xl mx-auto">
+    <div className="space-y-6 p-4 ">
       <div className="rounded-3xl bg-white">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

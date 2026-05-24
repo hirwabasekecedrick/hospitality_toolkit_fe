@@ -19,7 +19,7 @@ interface StatusCard {
 
 const statusCards: StatusCard[] = [
   {
-    label: "Revenue MTD",
+    label: "Revenue",
     value: "RWF 12.4M",
     detail: "+18% vs last month",
     icon: <TrendingUpIcon className="h-5 w-5 text-emerald-600" />,
@@ -60,7 +60,7 @@ function StatusCard({ card }: { card: StatusCard }) {
 export default function Page() {
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-3xl bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="mt-2 text-2xl sm:text-3xl font-semibold text-slate-950">Overview</h1>
@@ -82,7 +82,7 @@ export default function Page() {
       </div>
 
       <div className="space-y-6">
-        <div className="space-y-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="space-y-4 rounded-3xl bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-base font-semibold text-slate-900">Recent Transactions</p>
@@ -99,7 +99,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="space-y-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+        <div className="space-y-4 rounded-3xl bg-white p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-base font-semibold text-slate-900">Settlement Activity</p>

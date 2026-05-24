@@ -26,7 +26,6 @@ const defaultPurposes = [
   "Marketing",
   "Office Supplies",
   "Events",
-  "Software",
   "Training",
 ]
 
@@ -144,7 +143,7 @@ export default function AddCardPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-3xl bg-white p-6">
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-6">
@@ -167,7 +166,7 @@ export default function AddCardPage() {
                   <div className="mt-3">
                     <Popover>
                       <PopoverTrigger asChild>
-                        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:border-slate-300">
+                        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
                           <UserIcon className="h-4 w-4 text-slate-500" />
                           <span className="text-sm text-slate-500">Search employees or type a name</span>
                         </div>

@@ -22,7 +22,7 @@ export default function BudgetDetailPage() {
 
   if (!budget) {
     return (
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-3xl bg-white p-6">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => router.push("/corporate_admin/budget")}

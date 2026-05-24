@@ -13,7 +13,6 @@ export default function UsersPage() {
           <tr>
             <th className="px-4 py-2 text-left">ID</th>
             <th className="px-4 py-2 text-left">Name</th>
-            <th className="px-4 py-2 text-left">Email</th>
             <th className="px-4 py-2 text-left">Role</th>
             <th className="px-4 py-2 text-left">Status</th>
           </tr>
@@ -23,7 +22,6 @@ export default function UsersPage() {
             <tr key={user.id} className="border-t">
               <td className="px-4 py-2">{user.id}</td>
               <td className="px-4 py-2">{user.name}</td>
-              <td className="px-4 py-2 text-sm text-gray-600">{user.email}</td>
               <td className="px-4 py-2">{user.role}</td>
               <td className="px-4 py-2">
                 <span className={`px-2 py-1 rounded-full text-xs ${user.status === "active" ? "bg-emerald-100 text-emerald-800" : "bg-gray-100 text-gray-800"}`}> 

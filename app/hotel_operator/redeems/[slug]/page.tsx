@@ -35,7 +35,7 @@ export default function Page({ params }: Props) {
 
   return (
     <div className="space-y-6 px-0">
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+      <div className="rounded-3xl bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">{data.title}</h1>
