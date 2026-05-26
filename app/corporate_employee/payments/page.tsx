@@ -1,55 +1,15 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
 import { ArrowDownLeftIcon, ReceiptTextIcon, AlertCircleIcon } from "lucide-react"
 import { CorporateEmployeePaymentWizard } from "@/components/corporate_employee/payment-wizard"
-
-const TRANSACTIONS = [
-  {
-    id: "TXN-9482",
-    title: "Room charge",
-    datetime: "Today, 2:45 PM",
-    clientName: "John Doe",
-    clientOrg: "BK Group",
-    amount: 185000,
-    status: "Settled",
-    statusVariant: "success",
-    icon: "receipt",
-  },
-  {
-    id: "TXN-9481",
-    title: "Food & Beverage",
-    datetime: "Today, 1:15 PM",
-    clientName: "Alice Smith",
-    clientOrg: "MTN Rwanda",
-    amount: 42500,
-    status: "Settled",
-    statusVariant: "success",
-    icon: "receipt",
-  },
-  {
-    id: "TXN-9480",
-    title: "Boardroom Booking",
-    datetime: "Yesterday, 4:30 PM",
-    clientName: "Corporate Team",
-    clientOrg: "RwandAir",
-    amount: 280000,
-    status: "Pending",
-    statusVariant: "neutral",
-    icon: "arrow",
-  },
-  {
-    id: "TXN-9479",
-    title: "Spa Services",
-    datetime: "Yesterday, 11:20 AM",
-    clientName: "Sarah Jones",
-    clientOrg: "Bralirwa",
-    amount: 85000,
-    status: "Disputed",
-    statusVariant: "warning",
-    icon: "alert",
-  },
-]
+import {
+  getAllTransactions,
+  addTransaction,
+  SERVICE_PROVIDERS,
+  type CorporateEmployeeTransaction,
+} from "@/lib/corporateEmployeeTransactions"
 
 function formatAmount(amount: number) {
   return `RWF ${amount.toLocaleString()}`
@@ -67,11 +27,15 @@ function getStatusStyles(statusVariant: string) {
 }
 
 export default function Page() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">("amount_desc")
   const [paymentConfirmed, setPaymentConfirmed] = useState(false)
   const [paymentDescription, setPaymentDescription] = useState("")
-  const [transactionsData, setTransactionsData] = useState(TRANSACTIONS)
+  const [showWizard, setShowWizard] = useState(false)
+  const [transactionsData, setTransactionsData] = useState<CorporateEmployeeTransaction[]>(() => [
+    ...getAllTransactions(),
+  ])
 
   const filteredTransactions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase()
@@ -107,19 +71,31 @@ export default function Page() {
   }, [transactionsData])
 
   const handlePaymentConfirmed = (payment: { hotelId: string; amount: number }) => {
-    const newTransaction = {
+    const matchedProvider = SERVICE_PROVIDERS.find(
+      (provider) =>
+        provider.id.toLowerCase() === payment.hotelId.toLowerCase() ||
+        provider.name.toLowerCase().includes(payment.hotelId.toLowerCase())
+    )
+
+    const newTransaction: CorporateEmployeeTransaction = {
       id: `TXN-${Date.now()}`,
       title: `Hotel payment via QR ${payment.hotelId}`,
       datetime: "Just now",
-      clientName: "Hotel guest",
-      clientOrg: `Hotel ${payment.hotelId}`,
       amount: payment.amount,
       status: "Settled",
       statusVariant: "success",
       icon: "receipt",
+      userId: "USER-001",
+      serviceProviderId: matchedProvider?.id ?? SERVICE_PROVIDERS[0]?.id ?? "PROV-001",
+      paymentMethod: "QR payment",
+      reference: `QR-${Date.now()}`,
+      details: "Completed hotel payment initiated from the corporate employee payment wizard.",
+      clientName: "Corporate Traveler",
+      clientOrg: `Hotel ${payment.hotelId}`,
     }
 
-    setTransactionsData((current) => [newTransaction, ...current])
+    addTransaction(newTransaction)
+    setTransactionsData([...getAllTransactions()])
     setPaymentDescription(`${newTransaction.clientOrg} • ${formatAmount(newTransaction.amount)}`)
     setPaymentConfirmed(true)
   }
@@ -146,13 +122,30 @@ export default function Page() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-slate-950">Payments</h1>
-            <p className="mt-2 text-sm text-slate-500">Use hotel QR / ID, amount and password to confirm corporate employee payments.</p>
           </div>
         </div>
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <CorporateEmployeePaymentWizard onPaymentConfirmed={handlePaymentConfirmed} />
+        {!showWizard ? (
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-950">Ready to make a payment?</h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Click the button below to open the payment form.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowWizard(true)}
+              className="inline-flex items-center justify-center rounded-full bg-emerald-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
+            >
+              Pay now
+            </button>
+          </div>
+        ) : (
+          <CorporateEmployeePaymentWizard onPaymentConfirmed={handlePaymentConfirmed} />
+        )}
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
@@ -168,33 +161,37 @@ export default function Page() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredTransactions.map((txn) => (
-                <tr key={txn.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${txn.icon === "alert" ? "bg-orange-100 text-orange-700" : txn.icon === "arrow" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-700"}`}>
-                        {txn.icon === "receipt" ? (
-                          <ReceiptTextIcon className="h-5 w-5" />
-                        ) : txn.icon === "arrow" ? (
-                          <ArrowDownLeftIcon className="h-5 w-5" />
-                        ) : (
-                          <AlertCircleIcon className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-900">{txn.title}</p>
-                        <p className="text-xs text-slate-500">{txn.datetime} • {txn.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-slate-900">{txn.clientName}</p>
-                    <p className="text-xs text-slate-500">{txn.clientOrg}</p>
-                  </td>
-                  <td className="px-6 py-4 font-medium text-slate-900">{formatAmount(txn.amount)}</td>
-                  <td className="px-6 py-4 text-right">
-                    <span className={getStatusStyles(txn.statusVariant)}>{txn.status}</span>
-                  </td>
-                </tr>
+                <tr
+              key={txn.id}
+              className="cursor-pointer hover:bg-slate-50/50 transition-colors"
+              onClick={() => router.push(`/corporate_employee/payments/${txn.id}`)}
+            >
+              <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-full ${txn.icon === "alert" ? "bg-orange-100 text-orange-700" : txn.icon === "arrow" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-700"}`}>
+                    {txn.icon === "receipt" ? (
+                      <ReceiptTextIcon className="h-5 w-5" />
+                    ) : txn.icon === "arrow" ? (
+                      <ArrowDownLeftIcon className="h-5 w-5" />
+                    ) : (
+                      <AlertCircleIcon className="h-5 w-5" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900">{txn.title}</p>
+                    <p className="text-xs text-slate-500">{txn.datetime} • {txn.id}</p>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <p className="font-medium text-slate-900">{txn.clientName}</p>
+                <p className="text-xs text-slate-500">{txn.clientOrg}</p>
+              </td>
+              <td className="px-6 py-4 font-medium text-slate-900">{formatAmount(txn.amount)}</td>
+              <td className="px-6 py-4 text-right">
+                <span className={getStatusStyles(txn.statusVariant)}>{txn.status}</span>
+              </td>
+            </tr>
               ))}
               {filteredTransactions.length === 0 && (
                 <tr>

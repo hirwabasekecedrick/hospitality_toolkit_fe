@@ -45,21 +45,21 @@ const mainItems: NavItem[] = [
   //   url: "/corporate_employee/trips",
   //   icon: MapPinIcon,
   // },
-  {
-    title: "Bookings",
-    url: "/corporate_employee/bookings",
-    icon: BookOpenIcon,
-  },
-  {
-    title: "Schedule",
-    url: "/corporate_employee/schedule",
-    icon: CalendarIcon,
-  },
+  // {
+  //   title: "Bookings",
+  //   url: "/corporate_employee/bookings",
+  //   icon: BookOpenIcon,
+  // },
+  // {
+  //   title: "Schedule",
+  //   url: "/corporate_employee/schedule",
+  //   icon: CalendarIcon,
+  // },
 ]
 
 const financeItems: NavItem[] = [
   {
-    title: "Payments",
+    title: "Transactions",
     url: "/corporate_employee/payments",
     icon: CreditCardIcon,
   },

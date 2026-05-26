@@ -1,6 +1,7 @@
 "use client"
 
 import { CorporateAdminSearch } from "@/components/search_inputs/corporate_admin_search"
+import { getAllNotifications } from "@/lib/corporateEmployeeTransactions"
 import {
   BellIcon,
   ChevronDownIcon,
@@ -12,6 +13,7 @@ import {
   AlertCircleIcon,
   CheckCircle2Icon,
 } from "lucide-react"
+import Link from "next/link"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
   Sheet,
@@ -32,6 +34,8 @@ import {
 import { CorporateEmployeeSearch } from "../search_inputs/corporate_employee_search"
 
 export function CorporateEmployeeHeader() {
+  const notifications = getAllNotifications()
+
   return (
     <header className="relative left-0 right-0 flex h-20 items-center justify-between gap-2 border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-10 shadow-sm md:gap-4">
       {/* Left: Sidebar trigger + branding */}
@@ -68,78 +72,52 @@ export function CorporateEmployeeHeader() {
                   <div>
                     <SheetTitle className="text-white text-xl">Notifications</SheetTitle>
                     <SheetDescription className="text-emerald-100 text-sm">
-                      You have 3 unread updates
+                      You have {notifications.length} unread updates
                     </SheetDescription>
                   </div>
                 </div>
               </SheetHeader>
             </div>
             <div className="space-y-3 px-1">
-              {/* Notification 1 */}
-              <div className="group relative rounded-lg border border-emerald-100 bg-gradient-to-r from-emerald-50 to-transparent hover:border-emerald-300 hover:bg-gradient-to-r hover:from-emerald-100 hover:to-transparent transition-all p-4 cursor-pointer">
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-emerald-100">
-                    <CreditCardIcon className="h-5 w-5 text-emerald-700" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm font-semibold text-slate-900">New Card Requested</h4>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-200 text-emerald-800">
-                        New
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600 mt-1">Amina K. has requested a new virtual card.</p>
-                    <p className="text-xs text-slate-400 mt-2 flex items-center gap-1">
-                      <span>2 mins ago</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
+              {notifications.map((notification) => {
+                const isPayment = notification.type === "Payment"
+                const iconClass = notification.type === "Dispute" ? "bg-amber-100 text-amber-700" : notification.type === "Approval" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-700"
+                const badgeClass = notification.type === "Dispute" ? "bg-amber-200 text-amber-800" : notification.type === "Approval" ? "bg-slate-200 text-slate-800" : "bg-emerald-200 text-emerald-800"
 
-              {/* Notification 2 */}
-              <div className="group relative rounded-lg border border-amber-100 bg-gradient-to-r from-amber-50 to-transparent hover:border-amber-300 hover:bg-gradient-to-r hover:from-amber-100 hover:to-transparent transition-all p-4 cursor-pointer">
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-amber-100">
-                    <AlertTriangleIcon className="h-5 w-5 text-amber-700" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm font-semibold text-slate-900">Spending Limit Warning</h4>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-200 text-amber-800">
-                        Alert
-                      </span>
+                return (
+                  <Link
+                    key={notification.id}
+                    href={`/corporate_employee/notifications/${notification.id}`}
+                    className="group block rounded-lg border border-slate-100 bg-gradient-to-r from-slate-50 to-transparent hover:border-emerald-300 hover:bg-gradient-to-r hover:from-slate-100 hover:to-transparent transition-all p-4"
+                  >
+                    <div className="flex gap-3">
+                      <div className={`flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full ${iconClass}`}>
+                        {isPayment ? <CreditCardIcon className="h-5 w-5" /> : notification.type === "Approval" ? <CheckCircle2Icon className="h-5 w-5" /> : <AlertCircleIcon className="h-5 w-5" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-sm font-semibold text-slate-900">{notification.title}</h4>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}`}>
+                            {notification.type}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600 mt-1">{notification.subtitle}</p>
+                        <p className="text-xs text-slate-400 mt-2">{notification.datetime}</p>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-600 mt-1">Marketing Dept card has reached 90% of its limit.</p>
-                    <p className="text-xs text-slate-400 mt-2">1 hour ago</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Notification 3 */}
-              <div className="group relative rounded-lg border border-slate-100 bg-gradient-to-r from-slate-50 to-transparent hover:border-slate-300 hover:bg-gradient-to-r hover:from-slate-100 hover:to-transparent transition-all p-4 cursor-pointer">
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-slate-100">
-                    <AlertCircleIcon className="h-5 w-5 text-slate-700" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="text-sm font-semibold text-slate-900">System Update</h4>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-800">
-                        Info
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-600 mt-1">Scheduled maintenance tonight at 2 AM.</p>
-                    <p className="text-xs text-slate-400 mt-2">5 hours ago</p>
-                  </div>
-                </div>
-              </div>
+                  </Link>
+                )
+              })}
             </div>
 
             {/* Footer */}
             <div className="border-t border-slate-100 mt-6 pt-4">
-              <button className="w-full py-2 px-3 text-sm font-medium text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition">
+              <Link
+                href="/corporate_employee/notifications"
+                className="w-full block py-2 px-3 text-sm font-medium text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 rounded-lg transition text-center"
+              >
                 View All Notifications
-              </button>
+              </Link>
             </div>
           </SheetContent>
         </Sheet>

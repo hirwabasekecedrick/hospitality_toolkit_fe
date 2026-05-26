@@ -21,6 +21,10 @@ export default function Page() {
 
   // Payment states
   const [bankAccounts, setBankAccounts] = React.useState<BankAccount[]>(() => {
+    if (typeof window === "undefined") {
+      return [];
+    }
+
     try {
       const saved = localStorage.getItem("hotel_bank_accounts");
       return saved ? JSON.parse(saved) : [];

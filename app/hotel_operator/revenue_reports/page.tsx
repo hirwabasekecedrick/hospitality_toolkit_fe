@@ -97,7 +97,7 @@ export default function Page() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} />
                   <YAxis tickFormatter={(value) => `FRW${Math.round(value / 1000)}k`} tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} />
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} />
                   <Legend verticalAlign="top" height={36} />
                   <Bar dataKey="revenue" name="Revenue" fill="#16A34A" radius={[10, 10, 0, 0]} />
                 </BarChart>
@@ -122,13 +122,13 @@ export default function Page() {
                     innerRadius={60}
                     outerRadius={110}
                     paddingAngle={4}
-                    label={({ name, percent }) => `${name} ${Math.round(percent * 100)}%`}
+                    label={({ name, percent }) => `${name} ${Math.round((percent ?? 0) * 100)}%`}
                   >
                     {revenueDistribution.map((entry, index) => (
                       <Cell key={`cell-${entry.name}`} fill={categoryColors[index % categoryColors.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} />
                   <Legend verticalAlign="bottom" align="center" iconType="circle" />
                 </PieChart>
               </SafeResponsiveContainer>
@@ -149,7 +149,7 @@ export default function Page() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} horizontal={false} />
                 <XAxis type="number" tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} tickFormatter={(value) => `FRW${Math.round(value / 1000)}k`} />
                 <YAxis dataKey="name" type="category" width={150} tickLine={false} axisLine={false} tick={{ fill: "#334155", fontSize: 13 }} />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Tooltip formatter={(value) => formatCurrency(Number(value ?? 0))} />
                 <Bar dataKey="revenue" name="Revenue" fill="#0EA5E9" radius={[10, 10, 10, 10]} />
               </BarChart>
             </SafeResponsiveContainer>
