@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { ArrowDownLeftIcon, ReceiptTextIcon, AlertCircleIcon } from "lucide-react"
+import { CorporateEmployeePaymentWizard } from "@/components/corporate_employee/payment-wizard"
 
 const TRANSACTIONS = [
   {
@@ -68,10 +69,8 @@ function getStatusStyles(statusVariant: string) {
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">("amount_desc")
-  const [hotelId, setHotelId] = useState("")
-  const [paymentAmount, setPaymentAmount] = useState("")
-  const [password, setPassword] = useState("")
   const [paymentConfirmed, setPaymentConfirmed] = useState(false)
+  const [paymentDescription, setPaymentDescription] = useState("")
   const [transactionsData, setTransactionsData] = useState(TRANSACTIONS)
 
   const filteredTransactions = useMemo(() => {
@@ -107,30 +106,22 @@ export default function Page() {
     return Array.from(map.values()).slice(0, 5)
   }, [transactionsData])
 
-  const handlePaymentSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-
-    if (!hotelId || !paymentAmount || !password) {
-      return
-    }
-
+  const handlePaymentConfirmed = (payment: { hotelId: string; amount: number }) => {
     const newTransaction = {
       id: `TXN-${Date.now()}`,
-      title: `Hotel payment via QR ${hotelId}`,
+      title: `Hotel payment via QR ${payment.hotelId}`,
       datetime: "Just now",
       clientName: "Hotel guest",
-      clientOrg: `Hotel ${hotelId}`,
-      amount: Number(paymentAmount),
+      clientOrg: `Hotel ${payment.hotelId}`,
+      amount: payment.amount,
       status: "Settled",
       statusVariant: "success",
       icon: "receipt",
     }
 
     setTransactionsData((current) => [newTransaction, ...current])
+    setPaymentDescription(`${newTransaction.clientOrg} • ${formatAmount(newTransaction.amount)}`)
     setPaymentConfirmed(true)
-    setHotelId("")
-    setPaymentAmount("")
-    setPassword("")
   }
 
   return (
@@ -139,13 +130,13 @@ export default function Page() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-6">
           <div className="w-full max-w-2xl rounded-3xl border border-emerald-200 bg-white p-8 text-center shadow-2xl">
             <p className="text-sm uppercase tracking-[0.24em] text-emerald-700">Payment confirmed</p>
-            <h2 className="mt-4 text-3xl font-semibold text-slate-950">Hotel payment received</h2>
-            <p className="mt-3 text-sm text-slate-500">The hotel operator has been notified and the transaction is now stored in the system.</p>
+            <h2 className="mt-4 text-3xl font-semibold text-slate-950">Success</h2>
+            <p className="mt-3 text-sm text-slate-500">{paymentDescription || "The hotel operator has been notified and the transaction is now stored in the system."}</p>
             <button
               className="mt-8 rounded-full bg-emerald-700 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-800"
               onClick={() => setPaymentConfirmed(false)}
             >
-              Close notification
+              Close 
             </button>
           </div>
         </div>
@@ -157,53 +148,11 @@ export default function Page() {
             <h1 className="text-2xl font-semibold text-slate-950">Payments</h1>
             <p className="mt-2 text-sm text-slate-500">Use hotel QR / ID, amount and password to confirm corporate employee payments.</p>
           </div>
-          <div className="rounded-2xl bg-slate-50 px-4 py-2 text-sm text-slate-600">Corporate employee payment workflow</div>
         </div>
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-slate-950">Process Hotel Payment</h2>
-            <p className="mt-1 text-sm text-slate-500">Capture hotel QR, enter the amount, and confirm with a password.</p>
-          </div>
-          <div className="rounded-2xl bg-slate-50 px-4 py-2 text-sm text-slate-600">Full-screen confirmation alert is shown on success.</div>
-        </div>
-
-        <form onSubmit={handlePaymentSubmit} className="mt-6 grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Hotel QR / ID</label>
-            <input
-              value={hotelId}
-              onChange={(e) => setHotelId(e.target.value)}
-              placeholder="Scan hotel QR or enter ID"
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Amount (RWF)</label>
-            <input
-              value={paymentAmount}
-              onChange={(e) => setPaymentAmount(e.target.value)}
-              placeholder="200000"
-              type="number"
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Password</label>
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              type="password"
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none"
-            />
-          </div>
-          <button className="sm:col-span-3 rounded-2xl bg-emerald-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">
-            Confirm payment
-          </button>
-        </form>
+        <CorporateEmployeePaymentWizard onPaymentConfirmed={handlePaymentConfirmed} />
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">

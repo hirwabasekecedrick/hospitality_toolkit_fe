@@ -89,6 +89,7 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
                     alt="Sidebar logo"
                     width={180}
                     height={56}
+                    loading="eager"
                     className="h-full w-full object-contain"
                   />
                 </div>

@@ -176,7 +176,7 @@ export function Rha_Admin_Sidebar({ ...props }: React.ComponentProps<typeof Side
             <SidebarMenuButton size="lg" asChild>
               <a href="#" onClick={handleNavClick}>
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} className="rounded-md object-cover" />
+                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} loading="eager" className="rounded-md object-cover" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">Documentation</span>

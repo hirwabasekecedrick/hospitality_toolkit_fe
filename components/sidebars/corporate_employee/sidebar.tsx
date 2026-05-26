@@ -40,11 +40,11 @@ const mainItems: NavItem[] = [
     url: "/corporate_employee",
     icon: LayoutDashboardIcon,
   },
-  {
-    title: "My trips",
-    url: "/corporate_employee/trips",
-    icon: MapPinIcon,
-  },
+  // {
+  //   title: "My trips",
+  //   url: "/corporate_employee/trips",
+  //   icon: MapPinIcon,
+  // },
   {
     title: "Bookings",
     url: "/corporate_employee/bookings",
@@ -58,11 +58,6 @@ const mainItems: NavItem[] = [
 ]
 
 const financeItems: NavItem[] = [
-  {
-    title: "Earnings",
-    url: "/corporate_employee/earnings",
-    icon: CreditCardIcon,
-  },
   {
     title: "Payments",
     url: "/corporate_employee/payments",
@@ -103,7 +98,7 @@ export function CorporateEmployeeSidebar({
             <SidebarMenuButton size="lg" asChild>
               <Link href="/corporate_employee" className="flex items-center gap-3" onClick={handleNavClick}>
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} className="rounded-md object-cover" />
+                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} loading="eager" className="rounded-md object-cover" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-bold">yoGuide</span>

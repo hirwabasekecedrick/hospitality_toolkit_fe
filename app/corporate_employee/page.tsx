@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import {
   CalendarDaysIcon,
   CreditCardIcon,
@@ -23,7 +24,6 @@ import {
 const stats = [
   { label: "Confirmed", value: "0", icon: TicketIcon },
   { label: "Pending", value: "0", icon: FlagIcon },
-  { label: "Earnings", value: "RWF 0", icon: CreditCardIcon },
   { label: "Trips", value: "0", icon: CalendarDaysIcon },
 ];
 
@@ -57,13 +57,17 @@ export default function Page() {
       <div className="flex-2 space-y-1">
         <section className="overflow-hidden rounded-[2rem] bg-emerald-950 px-4 py-4 text-white shadow-xl shadow-emerald-950/40">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="w-full flex justify-center">
+            <div className="w-full flex flex-col items-center justify-center gap-4 text-center">
               <h1 className="mt-0 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                 Welcome back, user1!
               </h1>
-              
+              <Link
+                href="/corporate_employee/payments"
+                className="inline-flex rounded-full bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
+              >
+                Pay
+              </Link>
             </div>
-            
           </div>
 
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -138,107 +142,8 @@ export default function Page() {
                 </div>
               </div>
             </div>
-            {/* Charts row */}
-            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {/* Earnings Overview */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-slate-900">
-                    Earnings Overview
-                  </h3>
-                  <span className="text-sm text-slate-500">Total Earnings</span>
-                </div>
-                <div className="mt-4 h-48 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={[
-                        { month: "Jan", v: 0 },
-                        { month: "Feb", v: 0 },
-                        { month: "Mar", v: 0 },
-                        { month: "Apr", v: 0 },
-                        { month: "May", v: 0 },
-                      ]}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e6eef0" />
-                      <XAxis dataKey="month" stroke="#94a3b8" />
-                      <YAxis stroke="#94a3b8" />
-                      <Tooltip />
-                      <Line
-                        type="monotone"
-                        dataKey="v"
-                        stroke="#10b981"
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              {/* Earnings Breakdown */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-slate-900">
-                    Earnings Breakdown
-                  </h3>
-                  <div className="text-sm text-slate-500">%</div>
-                </div>
-                <div className="mt-4 flex items-center gap-4">
-                  <div className="h-40 w-40">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={[
-                            { name: "Confirmed", value: 55 },
-                            { name: "Completed", value: 30 },
-                            { name: "Pending", value: 10 },
-                            { name: "Other", value: 5 },
-                          ]}
-                          dataKey="value"
-                          innerRadius={40}
-                          outerRadius={60}
-                          paddingAngle={2}
-                        >
-                          <Cell fill="#10b981" />
-                          <Cell fill="#34d399" />
-                          <Cell fill="#f59e0b" />
-                          <Cell fill="#d1d5db" />
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="h-3 w-3 rounded-full bg-emerald-600" />
-                      <div className="flex-1 text-sm text-slate-700">
-                        Confirmed
-                      </div>
-                      <div className="text-sm font-semibold text-slate-900">
-                        RWF 0
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="h-3 w-3 rounded-full bg-green-300" />
-                      <div className="flex-1 text-sm text-slate-700">
-                        Completed
-                      </div>
-                      <div className="text-sm font-semibold text-slate-900">
-                        RWF 0
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="h-3 w-3 rounded-full bg-yellow-300" />
-                      <div className="flex-1 text-sm text-slate-700">
-                        Pending
-                      </div>
-                      <div className="text-sm font-semibold text-slate-900">
-                        RWF 0
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            Charts row
+            
           </div>
         </section>
       </div>
