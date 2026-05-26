@@ -83,17 +83,6 @@ export default function Page() {
 
       <div className="space-y-6">
         <div className="space-y-4 rounded-3xl bg-white p-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-base font-semibold text-slate-900">Recent Transactions</p>
-              <p className="text-sm text-slate-500">Latest card payments at your property.</p>
-            </div>
-            <div className="flex gap-2">
-              <a href="/hotel_operator/transactions" className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 inline-block">
-                View All
-              </a>
-            </div>
-          </div>
           <div className="space-y-4">
             <TransactionsOverview />
           </div>

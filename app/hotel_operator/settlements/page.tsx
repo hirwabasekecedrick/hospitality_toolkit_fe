@@ -1,6 +1,21 @@
+"use client"
+
+import { useState } from "react"
 import { ArrowRightLeftIcon, Building2Icon, CheckCircle2Icon } from "lucide-react"
 
 export function SettlementsOverview() {
+  const [manualRedeems, setManualRedeems] = useState(0)
+  const [redeemMessage, setRedeemMessage] = useState("")
+
+  const handleManualRedeem = () => {
+    setManualRedeems((count) => count + 1)
+    setRedeemMessage("Manual redeem request created and queued for settlement.")
+
+    window.setTimeout(() => {
+      setRedeemMessage("")
+    }, 4000)
+  }
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
@@ -13,11 +28,28 @@ export function SettlementsOverview() {
           </div>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-5">
-          <p className="text-sm font-semibold text-slate-600">Total settled this week</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">RWF 14.2M</p>
-          <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-            <Building2Icon className="h-4 w-4" />
-            <span>To Bank of Kigali •••• 4821</span>
+          <div className="flex items-start flex-col sm:flex-row justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-slate-600">Total unsettled </p>
+              <p className="mt-2 text-3xl font-bold text-slate-900">RWF 14.2M</p>
+              
+            </div>
+            <button
+              type="button"
+              onClick={handleManualRedeem}
+              className="rounded-2xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 w-full sm:w-auto"
+            >
+              Manual Redeem
+            </button>
+          </div>
+          {redeemMessage ? (
+            <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+              {redeemMessage}
+            </div>
+          ) : null}
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+            <p className="font-semibold">Transactions Queued</p>
+            <p>{manualRedeems} transactions.</p>
           </div>
         </div>
       </div>
@@ -74,9 +106,19 @@ export function SettlementsOverview() {
           </div>
         </div>
         <div className="bg-slate-50 px-6 py-3 border-t border-slate-200">
-          <button className="w-full text-sm font-semibold text-emerald-700 hover:text-emerald-800">
-            View full settlement history
-          </button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm font-semibold text-slate-700">
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                Previous
+              </button>
+              <span className="text-sm text-slate-500">Page 1 of 3</span>
+              <button className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -89,7 +131,8 @@ export default function Page() {
       <div className="rounded-3xl bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Settlements</h1>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Settlements & Redeems</h1>
+            <p className="mt-1 text-sm text-slate-500">Manual redeem and settlement activity are combined here for the hotel operator.</p>
           </div>
           <button className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 w-full sm:w-auto">
             Generate Report

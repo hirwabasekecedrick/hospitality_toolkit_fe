@@ -55,25 +55,9 @@ const data: { navMain: NavItem[] } = {
       icon: ArrowRightLeftIcon,
     },
     {
-      title: "Corporate clients",
-      url: `${DIRECTORY}/corporate_clients`,
-      icon: Building2Icon,
-    },
-    {
       title: "Revenue reports",
       url: `${DIRECTORY}/revenue_reports`,
       icon: BarChart3Icon,
-    },
-    {
-      title: "Disputes",
-      url: `${DIRECTORY}/disputes`,
-      icon: AlertCircleIcon,
-      notifications: 2,
-    },
-    {
-      title: "Redeems",
-      url: `${DIRECTORY}/redeems`,
-      icon: GiftIcon,
     },
     {
       title: "Settings",

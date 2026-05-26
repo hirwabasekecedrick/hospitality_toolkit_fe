@@ -31,24 +31,40 @@ const monthlyRevenue = [
 ]
 
 const companyRankings = [
-  { name: "Grand Horizon Hotels", revenue: 1260000 },
-  { name: "Urban Inn Group", revenue: 980000 },
-  { name: "Summit Suites", revenue: 830000 },
-  { name: "Harborview Hospitality", revenue: 720000 },
-  { name: "Maple Lane Resorts", revenue: 610000 },
+  { name: "I&M Group", revenue: 1260000 },
+  { name: "CIMERWA", revenue: 980000 },
+  { name: "Radio Rwanda", revenue: 830000 },
+  { name: "Musanze district", revenue: 720000 },
+  { name: "ERC Construction", revenue: 610000 },
 ]
 
 const revenueDistribution = [
-  { name: "Corporate Clients", value: 1420000 },
-  { name: "Direct Bookings", value: 860000 },
-  { name: "Travel Partners", value: 520000 },
-  { name: "Other Services", value: 190000 },
+  { name: "Restaurant", value: 1420000 },
+  { name: "Meeting Rooms", value: 860000 },
+  { name: "Sauna", value: 520000 },
+  { name: "Pool", value: 190000 },
 ]
 
 const categoryColors = ["#16A34A", "#0EA5E9", "#F59E0B", "#A855F7"]
 
 function formatCurrency(value: number) {
-  return `$${value.toLocaleString()}`
+  return `FRW${value.toLocaleString()}`
+}
+
+function SafeResponsiveContainer(
+  props: React.ComponentProps<typeof ResponsiveContainer>
+) {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className="h-full min-h-0 min-w-0" />
+  }
+
+  return <ResponsiveContainer {...props}>{props.children}</ResponsiveContainer>
 }
 
 export default function Page() {
@@ -75,28 +91,27 @@ export default function Page() {
               </span>
             </div>
 
-            <div className="h-[360px]">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-[360px] min-h-[360px] min-w-0">
+              <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <BarChart data={monthlyRevenue} margin={{ top: 20, right: 20, left: -12, bottom: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} />
-                  <YAxis tickFormatter={(value) => `$${Math.round(value / 1000)}k`} tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} />
+                  <YAxis tickFormatter={(value) => `FRW${Math.round(value / 1000)}k`} tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} />
                   <Tooltip formatter={(value: number) => formatCurrency(value)} />
                   <Legend verticalAlign="top" height={36} />
                   <Bar dataKey="revenue" name="Revenue" fill="#16A34A" radius={[10, 10, 0, 0]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </SafeResponsiveContainer>
             </div>
           </section>
 
           <section className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
             <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Revenue split</p>
-              <h2 className="mt-3 text-xl font-semibold text-slate-950">Corporate channels</h2>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Services Ranking</p>
             </div>
 
-            <div className="h-[360px]">
-              <ResponsiveContainer width="100%" height="100%">
+            <div className="h-[360px] min-h-[360px] min-w-0">
+              <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                 <PieChart>
                   <Pie
                     data={revenueDistribution}
@@ -116,7 +131,7 @@ export default function Page() {
                   <Tooltip formatter={(value: number) => formatCurrency(value)} />
                   <Legend verticalAlign="bottom" align="center" iconType="circle" />
                 </PieChart>
-              </ResponsiveContainer>
+              </SafeResponsiveContainer>
             </div>
           </section>
         </div>
@@ -128,16 +143,16 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="h-[420px]">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[420px] min-h-[420px] min-w-0">
+            <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
               <BarChart data={companyRankings} margin={{ top: 20, right: 10, left: -20, bottom: 10 }} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} horizontal={false} />
-                <XAxis type="number" tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} tickFormatter={(value) => `$${Math.round(value / 1000)}k`} />
+                <XAxis type="number" tickLine={false} axisLine={false} tick={{ fill: "#64748B", fontSize: 12 }} tickFormatter={(value) => `FRW${Math.round(value / 1000)}k`} />
                 <YAxis dataKey="name" type="category" width={150} tickLine={false} axisLine={false} tick={{ fill: "#334155", fontSize: 13 }} />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
                 <Bar dataKey="revenue" name="Revenue" fill="#0EA5E9" radius={[10, 10, 10, 10]} />
               </BarChart>
-            </ResponsiveContainer>
+            </SafeResponsiveContainer>
           </div>
         </div>
       </div>

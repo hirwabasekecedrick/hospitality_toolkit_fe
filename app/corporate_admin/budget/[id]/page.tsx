@@ -15,8 +15,9 @@ export default function BudgetDetailPage() {
   const [budget, setBudget] = useState<Budget | null>(null)
 
   useEffect(() => {
-    if (!params?.id) return
-    const found = getBudgetById(params.id)
+    const id = Array.isArray(params?.id) ? params.id[0] : params?.id
+    if (!id) return
+    const found = getBudgetById(id)
     setBudget(found ?? null)
   }, [params])
 

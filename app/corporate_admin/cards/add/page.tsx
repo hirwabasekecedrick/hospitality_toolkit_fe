@@ -3,11 +3,12 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { addCard } from "@/lib/cardsStore"
+import { addCard, type Card } from "@/lib/cardsStore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { ChevronLeftIcon, PlusIcon, UserIcon } from "lucide-react"
@@ -34,6 +35,10 @@ export default function AddCardPage() {
 
   const [selectedEmployees, setSelectedEmployees] = useState<{ id: string; name: string }[]>([])
   const [employeeQuery, setEmployeeQuery] = useState("")
+  const [cardType, setCardType] = useState<"per diem" | "corporate expense">("per diem")
+  const handleCardTypeChange = (value: string) => setCardType(value as "per diem" | "corporate expense")
+  const [teamLeader, setTeamLeader] = useState<{ id: string; name: string } | null>(null)
+  const [distributeToEmployees, setDistributeToEmployees] = useState(true)
   const [purpose, setPurpose] = useState("")
   const [amount, setAmount] = useState("")
   const [validityType, setValidityType] = useState<"single" | "range">("single")
@@ -54,14 +59,18 @@ export default function AddCardPage() {
 
   const addEmployee = (value: { id: string; name: string } | string) => {
     if (!value) return
+    if (cardType === "per diem" && selectedEmployees.length >= 1) return
+
     if (typeof value === "string") {
       const id = `custom-${Date.now()}`
       setSelectedEmployees((current) => [...current, { id, name: value }])
       setEmployeeQuery("")
       return
     }
-    // value is employee object
-    setSelectedEmployees((current) => (current.some((c) => c.id === value.id) ? current : [...current, { id: value.id, name: value.name }]))
+
+    setSelectedEmployees((current) =>
+      current.some((c) => c.id === value.id) ? current : [...current, { id: value.id, name: value.name }]
+    )
     setEmployeeQuery("")
   }
 
@@ -77,41 +86,23 @@ export default function AddCardPage() {
     event.preventDefault()
 
     const createdAt = Date.now()
+    const issueType = cardType === "per diem" ? "Per diem" : "Corporate expense"
 
-    if (selectedEmployees.length > 0) {
-      // create one card per selected employee
-      selectedEmployees.forEach((emp, idx) => {
-        const id = `${createdAt}-${idx}`
-        const last4 = Math.floor(1000 + Math.random() * 9000).toString()
-        const card = {
-          id,
-          type: "Virtual",
-          cardholder: emp.name,
-          cardholderId: emp.id,
-          employees: [{ id: emp.id, name: emp.name }],
-          purpose,
-          validityType,
-          validFrom: validityType === "range" ? validFrom : undefined,
-          validUntil: validityType === "range" ? validUntil : undefined,
-          last4,
-          status: "Active",
-          limit: amount ? `RWF ${amount}` : undefined,
-          amount: amount ? Number(amount) : undefined,
-          lastUsed: "Never",
-        }
-
-        addCard(card)
-      })
-    } else {
-      // single unassigned card
-      const id = `${createdAt}`
+    const buildCard = (
+      holder: { id?: string; name: string },
+      employeesForCard: { id: string; name: string }[] = []
+    ): Card => {
+      const id = `${createdAt}-${holder.id ?? "unassigned"}-${Math.floor(1000 + Math.random() * 9000)}`
       const last4 = Math.floor(1000 + Math.random() * 9000).toString()
-      const card = {
+
+      return {
         id,
         type: "Virtual",
-        cardholder: "Unassigned",
-        cardholderId: undefined,
-        employees: [],
+        issueType,
+        distributed: issueType === "Corporate expense" ? distributeToEmployees : false,
+        cardholder: holder.name,
+        cardholderId: holder.id,
+        employees: employeesForCard,
         purpose,
         validityType,
         validFrom: validityType === "range" ? validFrom : undefined,
@@ -122,12 +113,19 @@ export default function AddCardPage() {
         amount: amount ? Number(amount) : undefined,
         lastUsed: "Never",
       }
+    }
 
-      addCard(card)
+    if (cardType === "per diem") {
+      const employee = selectedEmployees[0]
+      addCard(
+        buildCard(employee ? { id: employee.id, name: employee.name } : { name: "Unassigned" }, employee ? [employee] : [])
+      )
+    } else {
+      const leader = teamLeader ?? { name: "Team leader" }
+      addCard(buildCard(leader, selectedEmployees))
     }
 
     setSubmitted(true)
-    // navigate back to cards list
     router.push("/corporate_admin/cards")
   }
 
@@ -147,74 +145,126 @@ export default function AddCardPage() {
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-6">
+            <div className="space-y-3">
+              <Tabs value={cardType} onValueChange={handleCardTypeChange} className="rounded-3xl border border-slate-200 bg-slate-50 p-2">
+                <TabsList>
+                  <TabsTrigger value="per diem" className="rounded-xl px-4 py-3">Per diem</TabsTrigger>
+                  <TabsTrigger value="corporate expense" className="rounded-xl px-4 py-3">Corporate expense</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <p className="text-sm text-slate-500">
+                {cardType === "per diem"
+                  ? "Issue a card for a single employee to manage their own payments."
+                  : "Create a corporate expense card for a mission team, assign a leader, and optionally distribute access to the selected members."}
+              </p>
+            </div>
+
+            {cardType === "corporate expense" ? (
               <div className="space-y-2">
-                <Label>Employee / Cardholder</Label>
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="flex flex-wrap gap-2">
-                    {selectedEmployees.map((employee) => (
-                      <button
-                        type="button"
-                        key={employee.id}
-                        onClick={() => removeEmployee(employee.id)}
-                        className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700 transition hover:border-slate-400"
-                      >
-                        {employee.name}
-                        <span className="text-slate-400">×</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-3">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
-                          <UserIcon className="h-4 w-4 text-slate-500" />
-                          <span className="text-sm text-slate-500">Search employees or type a name</span>
-                        </div>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full max-w-md p-2">
-                        <Command className="h-[320px]">
-                          <CommandInput
-                            placeholder="Search employees..."
-                            value={employeeQuery}
-                            onChange={(event) => setEmployeeQuery(event.target.value)}
-                          />
-                          <CommandList>
-                            {filteredEmployees.length > 0 ? (
-                              <CommandGroup heading="Employees">
-                                {filteredEmployees.map((employee) => (
-                                  <CommandItem
-                                    key={employee.id}
-                                    onSelect={() => addEmployee(employee)}
-                                  >
-                                    <span>{employee.name}</span>
-                                    <span className="ml-auto text-xs text-slate-400">{employee.role}</span>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            ) : (
-                              <CommandEmpty>No matching employees.</CommandEmpty>
-                            )}
-                          </CommandList>
-                        </Command>
-                        <div className="mt-2 flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
-                              if (employeeQuery.trim()) {
-                                addEmployee(employeeQuery.trim())
-                              }
-                            }}
-                            className="flex-1"
-                          >
-                            Add "{employeeQuery || "custom name"}"
-                          </Button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                <Label>Team leader</Label>
+                <select
+                  value={teamLeader?.id ?? ""}
+                  onChange={(e) => {
+                    const leader = employees.find((emp) => emp.id === e.target.value) ?? null
+                    setTeamLeader(leader)
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
+                >
+                  <option value="">Select team leader</option>
+                  {employees.map((employee) => (
+                    <option key={employee.id} value={employee.id}>
+                      {employee.name} • {employee.role}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : null}
+
+            <div className="space-y-2">
+              <Label>{cardType === "per diem" ? "Employee / Cardholder" : "Selected team members"}</Label>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                <div className="flex flex-wrap gap-2">
+                  {selectedEmployees.map((employee) => (
+                    <button
+                      type="button"
+                      key={employee.id}
+                      onClick={() => removeEmployee(employee.id)}
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700 transition hover:border-slate-400"
+                    >
+                      {employee.name}
+                      <span className="text-slate-400">×</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
+                        <UserIcon className="h-4 w-4 text-slate-500" />
+                        <span className="text-sm text-slate-500">Search employees or type a name</span>
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full max-w-md p-2">
+                      <Command className="h-[320px]">
+                        <CommandInput
+                          placeholder="Search employees..."
+                          value={employeeQuery}
+                          onValueChange={(value) => setEmployeeQuery(value)}
+                        />
+                        <CommandList>
+                          {filteredEmployees.length > 0 ? (
+                            <CommandGroup heading="Employees">
+                              {filteredEmployees.map((employee) => (
+                                <CommandItem
+                                  key={employee.id}
+                                  onSelect={() => addEmployee(employee)}
+                                >
+                                  <span>{employee.name}</span>
+                                  <span className="ml-auto text-xs text-slate-400">{employee.role}</span>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          ) : (
+                            <CommandEmpty>No matching employees.</CommandEmpty>
+                          )}
+                        </CommandList>
+                      </Command>
+                      <div className="mt-2 flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            if (employeeQuery.trim()) {
+                              addEmployee(employeeQuery.trim())
+                            }
+                          }}
+                          className="flex-1"
+                        >
+                          Add "{employeeQuery || "custom name"}"
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
+            </div>
+
+            {cardType === "corporate expense" ? (
+              <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={distributeToEmployees}
+                    onChange={(e) => setDistributeToEmployees(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  Distribute the corporate expense card to the selected employees
+                </label>
+                <p className="text-sm text-slate-500">
+                  When distributed, selected employees will see the remaining balance and transactions. If not distributed, only the team leader will have full visibility.
+                </p>
+              </div>
+            ) : null}
 
               <div className="space-y-2">
                 <Label htmlFor="purpose">Purpose</Label>

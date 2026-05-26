@@ -24,7 +24,8 @@ export function CardsTable() {
   }, [])
 
   const filteredCards = cards.filter((card) => {
-    if (filterType !== "all" && card.type.toLowerCase() !== filterType) return false
+    const issueType = card.issueType?.toLowerCase() ?? "virtual"
+    if (filterType !== "all" && issueType !== filterType) return false
     if (filterStatus !== "all" && card.status.toLowerCase() !== filterStatus) return false
     return true
   })
@@ -35,11 +36,12 @@ export function CardsTable() {
       <div className="flex flex-wrap gap-4 items-center">
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Card Type" />
+            <SelectValue placeholder="Issue Type" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="virtual">Virtual</SelectItem>
+            <SelectItem value="per diem">Per diem</SelectItem>
+            <SelectItem value="corporate expense">Corporate expense</SelectItem>
           </SelectContent>
         </Select>
 
@@ -63,7 +65,7 @@ export function CardsTable() {
             <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
               <tr>
                 <th className="px-6 py-4">Card Info</th>
-                <th className="px-6 py-4">Type</th>
+                <th className="px-6 py-4">Issue type</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Spend Limit</th>
                 <th className="px-6 py-4">Last Used</th>
@@ -89,8 +91,8 @@ export function CardsTable() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <Badge variant="outline" className={card.type === "Virtual" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-slate-50 text-slate-700"}>
-                      {card.type}
+                    <Badge variant="outline" className={card.issueType === "Per diem" ? "bg-sky-50 text-sky-700 border-sky-200" : "bg-emerald-50 text-emerald-700 border-emerald-200"}>
+                      {card.issueType}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
