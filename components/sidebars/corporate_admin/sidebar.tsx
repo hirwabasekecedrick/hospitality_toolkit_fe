@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 import {
   Sidebar,
@@ -16,11 +16,11 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar"
-import type { LucideIcon } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+} from "@/components/ui/sidebar";
+import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboardIcon,
   CreditCardIcon,
@@ -30,16 +30,16 @@ import {
   BarChart3Icon,
   Building2Icon,
   SettingsIcon,
-} from "lucide-react"
+} from "lucide-react";
 
 interface NavItem {
-  title: string
-  url: string
-  icon: LucideIcon
-  notifications?: number
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  notifications?: number;
 }
 
-const DIRECTORY = "/corporate_admin"
+const DIRECTORY = "/corporate_admin";
 
 const data: { navMain: NavItem[] } = {
   navMain: [
@@ -87,17 +87,19 @@ const data: { navMain: NavItem[] } = {
       icon: SettingsIcon,
     },
   ],
-}
+};
 
-export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname() || "/"
-  const { isMobile, setOpenMobile } = useSidebar()
+export function Corporate_Admin_Sidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname() || "/";
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const handleNavClick = () => {
     if (isMobile) {
-      setOpenMobile(false)
+      setOpenMobile(false);
     }
-  }
+  };
 
   return (
     <Sidebar {...props}>
@@ -105,13 +107,20 @@ export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeo
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/corporate_admin" className="flex items-center gap-3" onClick={handleNavClick}>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} loading="eager" className="rounded-md object-cover" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-bold">yoGuide</span>
-                  <span className="text-xs text-muted-foreground">Corporate Hospitality Card</span>
+              <Link
+                href="/corporate_admin"
+                className="block w-full px-4 py-10"
+                onClick={handleNavClick}
+              >
+                <div className="w-full  ">
+                  <Image
+                    src="/images/sidebarlogo.png"
+                    alt="Sidebar logo"
+                    width={180}
+                    height={56}
+                    loading="eager"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -122,20 +131,27 @@ export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeo
         <SidebarGroup>
           <SidebarMenu>
             {data.navMain.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname.startsWith(item.url)
+              const Icon = item.icon;
+              const isActive = pathname.startsWith(item.url);
               const linkClass = `flex w-full items-center gap-2 rounded-md px-2 py-2 ${
-                isActive ? "bg-emerald-50 text-emerald-700 font-semibold" : "text-slate-700 hover:bg-emerald-50"
-              }`
-              const iconClass = `size-4 shrink-0 ${isActive ? "text-emerald-700" : "text-slate-400"}`
+                isActive
+                  ? "bg-emerald-50 text-emerald-700 font-semibold"
+                  : "text-slate-700 hover:bg-emerald-50"
+              }`;
+              const iconClass = `size-4 shrink-0 ${isActive ? "text-emerald-700" : "text-slate-400"}`;
 
               return (
-                <SidebarMenuItem  key={item.title}>
+                <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} className={linkClass} onClick={handleNavClick}>
+                    <Link
+                      href={item.url}
+                      className={linkClass}
+                      onClick={handleNavClick}
+                    >
                       <Icon className={iconClass} />
                       <span className="truncate">{item.title}</span>
-                      {typeof item.notifications === "number" && item.notifications > 0 ? (
+                      {typeof item.notifications === "number" &&
+                      item.notifications > 0 ? (
                         <SidebarMenuBadge className="bg-emerald-700 text-white font-semibold shadow-md hover:bg-emerald-800 transition-colors">
                           {item.notifications}
                         </SidebarMenuBadge>
@@ -143,12 +159,12 @@ export function Corporate_Admin_Sidebar({ ...props }: React.ComponentProps<typeo
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              )
+              );
             })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

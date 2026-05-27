@@ -30,7 +30,7 @@ const TRANSACTIONS = [
   },
   {
     id: "TXN-9480",
-    title: "Boardroom Booking",
+    title: "Breakfast",
     datetime: "Yesterday, 4:30 PM",
     clientName: "Corporate Team",
     client_id: "CLT-0OP1",

@@ -253,7 +253,7 @@ export default function Page() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-                  Recent transactions
+                  Recent
                 </p>
                 
               </div>
@@ -261,7 +261,7 @@ export default function Page() {
                 href="/corporate_employee/payments"
                 className="rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800"
               >
-                View more
+                More
               </Link>
             </div>
 

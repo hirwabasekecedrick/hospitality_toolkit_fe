@@ -82,10 +82,10 @@ export function Hotel_Operator_Sidebar({ ...props }: React.ComponentProps<typeof
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="p-0" asChild>
-              <a href={DIRECTORY} onClick={handleNavClick} className="block w-full px-4 py-4">
-                <div className="mx-auto h-14 w-full max-w-[180px]">
+              <a href={DIRECTORY} onClick={handleNavClick} className="block w-full px-4 py-10">
+                <div className="w-full  ">
                   <Image
-                    src="/images/sidebar_logo.png"
+                    src="/images/sidebarlogo.png"
                     alt="Sidebar logo"
                     width={180}
                     height={56}

@@ -1,48 +1,54 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowDownLeftIcon, ReceiptTextIcon, AlertCircleIcon } from "lucide-react"
-import { CorporateEmployeePaymentWizard } from "@/components/corporate_employee/payment-wizard"
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  ArrowDownLeftIcon,
+  ReceiptTextIcon,
+  AlertCircleIcon,
+} from "lucide-react";
+import { CorporateEmployeePaymentWizard } from "@/components/corporate_employee/payment-wizard";
 import {
   getAllTransactions,
   addTransaction,
   SERVICE_PROVIDERS,
   type CorporateEmployeeTransaction,
-} from "@/lib/corporateEmployeeTransactions"
+} from "@/lib/corporateEmployeeTransactions";
 
 function formatAmount(amount: number) {
-  return `RWF ${amount.toLocaleString()}`
+  return `RWF ${amount.toLocaleString()}`;
 }
 
 function getStatusStyles(statusVariant: string) {
   switch (statusVariant) {
     case "success":
-      return "inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200"
+      return "inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200";
     case "warning":
-      return "inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200"
+      return "inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700 border border-orange-200";
     default:
-      return "inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 border border-slate-200"
+      return "inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700 border border-slate-200";
   }
 }
 
 export default function Page() {
-  const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">("amount_desc")
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false)
-  const [paymentDescription, setPaymentDescription] = useState("")
-  const [showWizard, setShowWizard] = useState(false)
-  const [transactionsData, setTransactionsData] = useState<CorporateEmployeeTransaction[]>(() => [
-    ...getAllTransactions(),
-  ])
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">(
+    "amount_desc",
+  );
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
+  const [paymentDescription, setPaymentDescription] = useState("");
+  const [showWizard, setShowWizard] = useState(false);
+  const [transactionsData, setTransactionsData] = useState<
+    CorporateEmployeeTransaction[]
+  >(() => [...getAllTransactions()]);
 
   const filteredTransactions = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase()
+    const query = searchTerm.trim().toLowerCase();
 
     return transactionsData
       .filter((txn) => {
-        if (!query) return true
+        if (!query) return true;
 
         return (
           txn.id.toLowerCase().includes(query) ||
@@ -50,32 +56,38 @@ export default function Page() {
           txn.clientName.toLowerCase().includes(query) ||
           txn.clientOrg.toLowerCase().includes(query) ||
           formatAmount(txn.amount).toLowerCase().includes(query)
-        )
+        );
       })
       .sort((a, b) => {
         if (sortOrder === "amount_asc") {
-          return a.amount - b.amount
+          return a.amount - b.amount;
         }
-        return b.amount - a.amount
-      })
-  }, [searchTerm, sortOrder, transactionsData])
+        return b.amount - a.amount;
+      });
+  }, [searchTerm, sortOrder, transactionsData]);
 
   const recentClients = useMemo(() => {
-    const map = new Map<string, { clientOrg: string; clientName: string }>()
+    const map = new Map<string, { clientOrg: string; clientName: string }>();
     transactionsData.forEach((txn) => {
       if (!map.has(txn.clientOrg)) {
-        map.set(txn.clientOrg, { clientOrg: txn.clientOrg, clientName: txn.clientName })
+        map.set(txn.clientOrg, {
+          clientOrg: txn.clientOrg,
+          clientName: txn.clientName,
+        });
       }
-    })
-    return Array.from(map.values()).slice(0, 5)
-  }, [transactionsData])
+    });
+    return Array.from(map.values()).slice(0, 5);
+  }, [transactionsData]);
 
-  const handlePaymentConfirmed = (payment: { hotelId: string; amount: number }) => {
+  const handlePaymentConfirmed = (payment: {
+    hotelId: string;
+    amount: number;
+  }) => {
     const matchedProvider = SERVICE_PROVIDERS.find(
       (provider) =>
         provider.id.toLowerCase() === payment.hotelId.toLowerCase() ||
-        provider.name.toLowerCase().includes(payment.hotelId.toLowerCase())
-    )
+        provider.name.toLowerCase().includes(payment.hotelId.toLowerCase()),
+    );
 
     const newTransaction: CorporateEmployeeTransaction = {
       id: `TXN-${Date.now()}`,
@@ -86,54 +98,55 @@ export default function Page() {
       statusVariant: "success",
       icon: "receipt",
       userId: "USER-001",
-      serviceProviderId: matchedProvider?.id ?? SERVICE_PROVIDERS[0]?.id ?? "PROV-001",
+      serviceProviderId:
+        matchedProvider?.id ?? SERVICE_PROVIDERS[0]?.id ?? "PROV-001",
       paymentMethod: "QR payment",
       reference: `QR-${Date.now()}`,
-      details: "Completed hotel payment initiated from the corporate employee payment wizard.",
+      details:
+        "Completed hotel payment initiated from the corporate employee payment wizard.",
       clientName: "Corporate Traveler",
       clientOrg: `Hotel ${payment.hotelId}`,
-    }
+    };
 
-    addTransaction(newTransaction)
-    setTransactionsData([...getAllTransactions()])
-    setPaymentDescription(`${newTransaction.clientOrg} • ${formatAmount(newTransaction.amount)}`)
-    setPaymentConfirmed(true)
-  }
+    addTransaction(newTransaction);
+    setTransactionsData([...getAllTransactions()]);
+    setPaymentDescription(
+      `${newTransaction.clientOrg} • ${formatAmount(newTransaction.amount)}`,
+    );
+    setPaymentConfirmed(true);
+  };
 
   return (
     <div className="space-y-6">
       {paymentConfirmed && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-6">
           <div className="w-full max-w-2xl rounded-3xl border border-emerald-200 bg-white p-8 text-center shadow-2xl">
-            <p className="text-sm uppercase tracking-[0.24em] text-emerald-700">Payment confirmed</p>
-            <h2 className="mt-4 text-3xl font-semibold text-slate-950">Success</h2>
-            <p className="mt-3 text-sm text-slate-500">{paymentDescription || "The hotel operator has been notified and the transaction is now stored in the system."}</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-emerald-700">
+              Payment confirmed
+            </p>
+            <h2 className="mt-4 text-3xl font-semibold text-slate-950">
+              Success
+            </h2>
+            <p className="mt-3 text-sm text-slate-500">
+              {paymentDescription ||
+                "The hotel operator has been notified and the transaction is now stored in the system."}
+            </p>
             <button
               className="mt-8 rounded-full bg-emerald-700 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-800"
               onClick={() => setPaymentConfirmed(false)}
             >
-              Close 
+              Close
             </button>
           </div>
         </div>
       )}
-
-      <div className="rounded-3xl bg-white p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-950">Payments</h1>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="">
         {!showWizard ? (
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-slate-950">Ready to make a payment?</h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Click the button below to open the payment form.
-              </p>
+              <h1 className="text-2xl font-semibold text-slate-950">
+                Payments
+              </h1>
             </div>
             <button
               type="button"
@@ -144,7 +157,9 @@ export default function Page() {
             </button>
           </div>
         ) : (
-          <CorporateEmployeePaymentWizard onPaymentConfirmed={handlePaymentConfirmed} />
+          <CorporateEmployeePaymentWizard
+            onPaymentConfirmed={handlePaymentConfirmed}
+          />
         )}
       </div>
 
@@ -162,40 +177,57 @@ export default function Page() {
             <tbody className="divide-y divide-slate-100">
               {filteredTransactions.map((txn) => (
                 <tr
-              key={txn.id}
-              className="cursor-pointer hover:bg-slate-50/50 transition-colors"
-              onClick={() => router.push(`/corporate_employee/payments/${txn.id}`)}
-            >
-              <td className="px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-full ${txn.icon === "alert" ? "bg-orange-100 text-orange-700" : txn.icon === "arrow" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-700"}`}>
-                    {txn.icon === "receipt" ? (
-                      <ReceiptTextIcon className="h-5 w-5" />
-                    ) : txn.icon === "arrow" ? (
-                      <ArrowDownLeftIcon className="h-5 w-5" />
-                    ) : (
-                      <AlertCircleIcon className="h-5 w-5" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-900">{txn.title}</p>
-                    <p className="text-xs text-slate-500">{txn.datetime} • {txn.id}</p>
-                  </div>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <p className="font-medium text-slate-900">{txn.clientName}</p>
-                <p className="text-xs text-slate-500">{txn.clientOrg}</p>
-              </td>
-              <td className="px-6 py-4 font-medium text-slate-900">{formatAmount(txn.amount)}</td>
-              <td className="px-6 py-4 text-right">
-                <span className={getStatusStyles(txn.statusVariant)}>{txn.status}</span>
-              </td>
-            </tr>
+                  key={txn.id}
+                  className="cursor-pointer hover:bg-slate-50/50 transition-colors"
+                  onClick={() =>
+                    router.push(`/corporate_employee/payments/${txn.id}`)
+                  }
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-full ${txn.icon === "alert" ? "bg-orange-100 text-orange-700" : txn.icon === "arrow" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-700"}`}
+                      >
+                        {txn.icon === "receipt" ? (
+                          <ReceiptTextIcon className="h-5 w-5" />
+                        ) : txn.icon === "arrow" ? (
+                          <ArrowDownLeftIcon className="h-5 w-5" />
+                        ) : (
+                          <AlertCircleIcon className="h-5 w-5" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900">
+                          {txn.title}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {txn.datetime} • {txn.id}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <p className="font-medium text-slate-900">
+                      {txn.clientName}
+                    </p>
+                    <p className="text-xs text-slate-500">{txn.clientOrg}</p>
+                  </td>
+                  <td className="px-6 py-4 font-medium text-slate-900">
+                    {formatAmount(txn.amount)}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <span className={getStatusStyles(txn.statusVariant)}>
+                      {txn.status}
+                    </span>
+                  </td>
+                </tr>
               ))}
               {filteredTransactions.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-sm text-slate-500">
+                  <td
+                    colSpan={4}
+                    className="px-6 py-12 text-center text-sm text-slate-500"
+                  >
                     No transactions found matching your search.
                   </td>
                 </tr>
@@ -205,5 +237,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  )
+  );
 }

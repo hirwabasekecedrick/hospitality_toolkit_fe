@@ -81,8 +81,8 @@ export function CorporateEmployeeHeader() {
             <div className="space-y-3 px-1">
               {notifications.map((notification) => {
                 const isPayment = notification.type === "Payment"
-                const iconClass = notification.type === "Dispute" ? "bg-amber-100 text-amber-700" : notification.type === "Approval" ? "bg-slate-100 text-slate-700" : "bg-emerald-100 text-emerald-700"
-                const badgeClass = notification.type === "Dispute" ? "bg-amber-200 text-amber-800" : notification.type === "Approval" ? "bg-slate-200 text-slate-800" : "bg-emerald-200 text-emerald-800"
+                const iconClass = notification.type === "bg-emerald-100 text-emerald-700"
+                const badgeClass = notification.type === "bg-emerald-200 text-emerald-800"
 
                 return (
                   <Link
@@ -126,7 +126,7 @@ export function CorporateEmployeeHeader() {
           <DropdownMenuTrigger asChild>
             <button className="hidden items-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold text-slate-900 transition hover:bg-slate-50 sm:flex sm:px-3 sm:py-2 sm:text-sm">
               <UserCircle2Icon className="h-4 w-4 text-emerald-700 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">admin1</span>
+              <span className="hidden sm:inline">Jacques</span>
               <ChevronDownIcon className="h-3 w-3 text-slate-500 sm:h-4 sm:w-4" />
             </button>
           </DropdownMenuTrigger>
@@ -152,7 +152,7 @@ export function CorporateEmployeeHeader() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>admin1</DropdownMenuLabel>
+            <DropdownMenuLabel>Jacques</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer">
               <SettingsIcon className="mr-2 h-4 w-4" />

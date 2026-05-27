@@ -65,13 +65,16 @@ export function SuperAdminSidebar({ ...props }: React.ComponentProps<typeof Side
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/super_admin" className="flex items-center gap-3" onClick={handleNavClick}>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Image src="/images/sidebar_logo.png" alt="Sidebar logo" width={32} height={32} loading="eager" className="rounded-md object-cover" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-bold">yoGuide</span>
-                  <span className="text-xs text-muted-foreground">Super Admin</span>
+              <Link href="/super_admin" className="block w-full px-4 py-10" onClick={handleNavClick}>
+                <div className="w-full  ">
+                  <Image
+                    src="/images/sidebarlogo.png"
+                    alt="Sidebar logo"
+                    width={180}
+                    height={56}
+                    loading="eager"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
               </Link>
             </SidebarMenuButton>
