@@ -6,8 +6,8 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { CSS } from '@dnd-kit/utilities'
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { GripVerticalIcon, WalletIcon, BuildingIcon, CreditCardIcon, AlertTriangleIcon } from "lucide-react"
-import { getBudgets, subscribeBudgets, type Budget } from "@/lib/budgetStore"
+import { GripVerticalIcon, WalletIcon, BuildingIcon, CreditCardIcon, AlertTriangleIcon, Loader2Icon } from "lucide-react"
+import { getBudgets, type Budget } from "@/lib/budgetStore"
 import Link from "next/link"
 
 function SortableBudgetItem({ item }: { item: Budget }) {
@@ -68,7 +68,6 @@ function SortableBudgetItem({ item }: { item: Budget }) {
         </div>
       </div>
       
-      {/* Slider for reallocating directly within the card */}
       <div className="pl-8 pr-2 pt-2">
         <p className="text-xs font-medium text-slate-500 mb-2">Adjust Allocation Limit</p>
         <Slider defaultValue={[item.allocated]} max={5000000} step={100000} className="w-full" />
@@ -78,11 +77,20 @@ function SortableBudgetItem({ item }: { item: Budget }) {
 }
 
 export function BudgetAllocations() {
-  const [items, setItems] = useState<Budget[]>(() => getBudgets())
+  const [items, setItems] = useState<Budget[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = subscribeBudgets(() => setItems(getBudgets()))
-    return unsubscribe
+    const load = async () => {
+      try {
+        const data = await getBudgets()
+        setItems(data)
+      } catch {
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
   const sensors = useSensors(
@@ -105,6 +113,10 @@ export function BudgetAllocations() {
   const totalSpent = items.reduce((acc, item) => acc + item.spent, 0)
   const corporateFloat = 8400000
   const availableFloat = corporateFloat - totalAllocated
+
+  if (loading) {
+    return <div className="flex justify-center p-8"><Loader2Icon className="h-6 w-6 animate-spin text-slate-400" /></div>
+  }
 
   return (
     <div className="space-y-6">

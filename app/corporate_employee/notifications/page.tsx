@@ -1,8 +1,41 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { getAllNotifications } from "@/lib/corporateEmployeeTransactions"
+import { toast } from "sonner"
+import { getAllNotifications, type CorporateEmployeeNotification } from "@/lib/corporateEmployeeTransactions"
+import { api } from "@/lib/api-client"
+import { Loader2Icon, CheckCheckIcon } from "lucide-react"
 
 export default function Page() {
-  const notifications = getAllNotifications()
+  const [notifications, setNotifications] = useState<CorporateEmployeeNotification[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getAllNotifications()
+        setNotifications(data)
+      } catch {
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const handleMarkAllRead = async () => {
+    try {
+      await api.post("/notifications/read-all")
+      toast.success("All notifications marked as read")
+    } catch {
+      toast.error("Failed to mark all as read")
+    }
+  }
+
+  if (loading) {
+    return <div className="flex justify-center p-8"><Loader2Icon className="h-6 w-6 animate-spin text-slate-400" /></div>
+  }
 
   return (
     <div className="space-y-6 px-0">
@@ -12,9 +45,18 @@ export default function Page() {
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Notifications</h1>
             <p className="mt-1 text-sm text-slate-500">Review the latest system and transaction alerts for your corporate employee account.</p>
           </div>
-          <Link href="/corporate_employee" className="rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800">
-            Back to dashboard
-          </Link>
+          <div className="flex gap-3">
+            <button
+              onClick={handleMarkAllRead}
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+            >
+              <CheckCheckIcon className="h-4 w-4" />
+              Mark all read
+            </button>
+            <Link href="/corporate_employee" className="rounded-full bg-emerald-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800">
+              Back to dashboard
+            </Link>
+          </div>
         </div>
       </div>
 

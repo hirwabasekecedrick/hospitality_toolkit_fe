@@ -1,21 +1,59 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import { NotificationDetail } from "@/components/notification-detail"
 import {
-  TRANSACTIONS,
   getNotificationById,
   getAllNotifications,
+  getAllTransactions,
+  type CorporateEmployeeNotification,
+  type CorporateEmployeeTransaction,
 } from "@/lib/corporateEmployeeTransactions"
-
-type Props = { params: Promise<{ notificationId: string }> }
+import { api } from "@/lib/api-client"
+import { Loader2Icon } from "lucide-react"
 
 function formatAmount(amount: number) {
   return `RWF ${amount.toLocaleString()}`
 }
 
-export default async function Page({ params }: Props) {
-  const { notificationId } = await params
-  const notification = getNotificationById(notificationId)
-  const notifications = getAllNotifications()
+export default function Page() {
+  const params = useParams()
+  const notificationId = Array.isArray(params?.notificationId) ? params.notificationId[0] : params?.notificationId
+
+  const [notification, setNotification] = useState<CorporateEmployeeNotification | null>(null)
+  const [notifications, setNotifications] = useState<CorporateEmployeeNotification[]>([])
+  const [transactions, setTransactions] = useState<CorporateEmployeeTransaction[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      if (!notificationId) return
+      try {
+        const [notif, notifs, txns] = await Promise.all([
+          getNotificationById(notificationId),
+          getAllNotifications(),
+          getAllTransactions(),
+        ])
+        setNotification(notif)
+        setNotifications(notifs)
+        setTransactions(txns)
+
+        if (notif) {
+          api.post(`/notifications/${notificationId}/read`).catch(() => {})
+        }
+      } catch {
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [notificationId])
+
+  if (loading) {
+    return <div className="flex justify-center p-8"><Loader2Icon className="h-6 w-6 animate-spin text-slate-400" /></div>
+  }
 
   if (!notification) {
     return (
@@ -51,7 +89,7 @@ export default async function Page({ params }: Props) {
             </div>
 
             <div className="mt-6 space-y-4">
-              {TRANSACTIONS.map((txn) => (
+              {transactions.slice(0, 5).map((txn) => (
                 <Link
                   key={txn.id}
                   href={`/corporate_employee/payments/${txn.id}`}

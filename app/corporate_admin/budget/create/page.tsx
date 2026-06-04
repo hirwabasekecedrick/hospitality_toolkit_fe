@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { toast } from "sonner"
 import { addBudget } from "@/lib/budgetStore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,22 +37,20 @@ export default function CreateBudgetPage() {
     )
   }, [allocationType])
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const id = `budget-${Date.now()}`
-    addBudget({
-      id,
-      name: name || "New Budget",
-      allocationType,
-      purpose,
-      allocated: Number(allocated) || 0,
-      spent: 0,
-      ceiling: Number(ceiling) || Number(allocated) || 0,
-      status: "Active",
-      createdAt: new Date().toISOString().slice(0, 10),
-      usage: [],
-    })
-    router.push(`/corporate_admin/budget/${id}`)
+    try {
+      const result = await addBudget({
+        name: name || "New Budget",
+        allocationType,
+        purpose,
+        allocated: Number(allocated) || 0,
+        ceiling: Number(ceiling) || Number(allocated) || 0,
+      })
+      router.push(`/corporate_admin/budget/${result.id}`)
+    } catch {
+      toast.error("Failed to create budget")
+    }
   }
 
   return (

@@ -1,10 +1,11 @@
 "use client"
 
-import * as React from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { mockRedeems } from "@/lib/redeems"
+import { getRedeemList, type RedeemSummary } from "@/lib/redeems"
+import { Loader2Icon } from "lucide-react"
 
-const statusStyles: Record<"Pending" | "Completed" | "Processing" | "Failed", string> = {
+const statusStyles: Record<string, string> = {
   Pending: "bg-amber-100 text-amber-800",
   Completed: "bg-emerald-100 text-emerald-800",
   Processing: "bg-sky-100 text-sky-800",
@@ -12,9 +13,28 @@ const statusStyles: Record<"Pending" | "Completed" | "Processing" | "Failed", st
 }
 
 export default function Page() {
-  const totalRedeems = mockRedeems.length
-  const totalAmount = mockRedeems.reduce((sum, item) => sum + item.amount, 0)
-  const nextRedeem = mockRedeems.find((item) => item.status === "Pending" || item.status === "Processing")?.nextRun
+  const [redeems, setRedeems] = useState<RedeemSummary[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getRedeemList()
+        setRedeems(data)
+      } catch {
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  if (loading) {
+    return <div className="flex justify-center p-8"><Loader2Icon className="h-6 w-6 animate-spin text-slate-400" /></div>
+  }
+
+  const totalAmount = redeems.reduce((sum, item) => sum + item.amount, 0)
+  const nextRedeem = redeems.find((item) => item.status === "Pending" || item.status === "Processing")?.nextRun
 
   return (
     <div className="space-y-6  px-0">
@@ -23,11 +43,10 @@ export default function Page() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-semibold text-slate-950">Redeems</h1>
           </div>
-          
         </div>
 
         <div className="mt-6 space-y-4">
-          {mockRedeems.map((item) => (
+          {redeems.map((item) => (
             <Link
               key={item.id}
               href={`/hotel_operator/redeems/${item.id}`}
@@ -36,7 +55,7 @@ export default function Page() {
               <div className="flex flex-row sm:flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold text-slate-600">{item.title}</p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-950">${item.amount.toFixed(2)}</p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-950">RWF {item.amount.toLocaleString()}</p>
                 </div>
                 <div className="flex flex-col items-start gap-2 sm:items-end">
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyles[item.status] ?? "bg-slate-100 text-slate-800"}`}>

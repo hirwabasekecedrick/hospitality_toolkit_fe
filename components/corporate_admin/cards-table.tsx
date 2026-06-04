@@ -7,21 +7,62 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontalIcon, CreditCardIcon, BanIcon, Edit2Icon, RefreshCcwIcon } from "lucide-react"
+import { MoreHorizontalIcon, CreditCardIcon, BanIcon, Edit2Icon, RefreshCcwIcon, Loader2Icon } from "lucide-react"
 
-import { getCards, subscribe, type Card } from "@/lib/cardsStore"
+import { getCards, updateCard, type Card } from "@/lib/cardsStore"
 
 export function CardsTable() {
   const router = useRouter()
   const [filterType, setFilterType] = useState("all")
   const [filterStatus, setFilterStatus] = useState("all")
+  const [cards, setCards] = useState<Card[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const [cards, setCards] = useState<Card[]>(() => getCards())
+  const loadCards = async () => {
+    setLoading(true)
+    try {
+      const data = await getCards()
+      setCards(data)
+    } catch {
+      toast.error("Failed to load cards")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const unsub = subscribe(() => setCards(getCards()))
-    return unsub
+    loadCards()
   }, [])
+
+  const handleSuspend = async (card: Card) => {
+    try {
+      await updateCard(card.id, { status: "SUSPENDED" })
+      toast.success(`Suspended ${card.cardholder}'s card`)
+      loadCards()
+    } catch {
+      toast.error("Failed to suspend card")
+    }
+  }
+
+  const handleReactivate = async (card: Card) => {
+    try {
+      await updateCard(card.id, { status: "ACTIVE" })
+      toast.success(`Reactivated ${card.cardholder}'s card`)
+      loadCards()
+    } catch {
+      toast.error("Failed to reactivate card")
+    }
+  }
+
+  const handleCancel = async (card: Card) => {
+    try {
+      await updateCard(card.id, { status: "CANCELLED" })
+      toast.success(`Cancelled ${card.cardholder}'s card`)
+      loadCards()
+    } catch {
+      toast.error("Failed to cancel card")
+    }
+  }
 
   const filteredCards = cards.filter((card) => {
     const issueType = card.issueType?.toLowerCase() ?? "virtual"
@@ -32,7 +73,6 @@ export function CardsTable() {
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
       <div className="flex flex-wrap gap-4 items-center">
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[180px]">
@@ -58,7 +98,6 @@ export function CardsTable() {
         </Select>
       </div>
 
-      {/* Table */}
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -73,7 +112,13 @@ export function CardsTable() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {filteredCards.map((card) => (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                    <Loader2Icon className="mx-auto h-5 w-5 animate-spin" />
+                  </td>
+                </tr>
+              ) : filteredCards.map((card) => (
                 <tr 
                   key={card.id} 
                   className="hover:bg-slate-50 transition-colors cursor-pointer"
@@ -110,7 +155,7 @@ export function CardsTable() {
                     {card.limit}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-slate-500">
-                    {card.lastUsed}
+                    {card.lastUsed || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <DropdownMenu>
@@ -135,7 +180,7 @@ export function CardsTable() {
                           className="cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
-                            toast.success(`Viewing transactions for ${card.cardholder}'s card`);
+                            router.push(`/corporate_admin/cards/${card.id}`);
                           }}
                         >
                           <RefreshCcwIcon className="mr-2 h-4 w-4" /> View transactions
@@ -146,7 +191,7 @@ export function CardsTable() {
                             className="cursor-pointer text-orange-600 focus:bg-orange-50 focus:text-orange-700"
                             onClick={(e) => {
                               e.stopPropagation();
-                              toast.success(`Suspended ${card.cardholder}'s card`);
+                              handleSuspend(card);
                             }}
                           >
                             <BanIcon className="mr-2 h-4 w-4" /> Suspend card
@@ -156,7 +201,7 @@ export function CardsTable() {
                             className="cursor-pointer text-emerald-600 focus:bg-emerald-50 focus:text-emerald-700"
                             onClick={(e) => {
                               e.stopPropagation();
-                              toast.success(`Reactivated ${card.cardholder}'s card`);
+                              handleReactivate(card);
                             }}
                           >
                             <RefreshCcwIcon className="mr-2 h-4 w-4" /> Reactivate card
@@ -167,7 +212,7 @@ export function CardsTable() {
                             className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-700"
                             onClick={(e) => {
                               e.stopPropagation();
-                              toast.success(`Cancelled ${card.cardholder}'s card`);
+                              handleCancel(card);
                             }}
                           >
                             <BanIcon className="mr-2 h-4 w-4" /> Cancel card
@@ -178,7 +223,7 @@ export function CardsTable() {
                   </td>
                 </tr>
               ))}
-              {filteredCards.length === 0 && (
+              {!loading && filteredCards.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
                     No cards found matching your criteria.

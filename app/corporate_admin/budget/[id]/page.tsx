@@ -7,19 +7,40 @@ import { getBudgetById, type Budget } from "@/lib/budgetStore"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeftIcon } from "lucide-react"
+import { ArrowLeftIcon, Loader2Icon } from "lucide-react"
 
 export default function BudgetDetailPage() {
   const params = useParams()
   const router = useRouter()
   const [budget, setBudget] = useState<Budget | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const id = Array.isArray(params?.id) ? params.id[0] : params?.id
-    if (!id) return
-    const found = getBudgetById(id)
-    setBudget(found ?? null)
+    const load = async () => {
+      const id = Array.isArray(params?.id) ? params.id[0] : params?.id
+      if (!id) {
+        setLoading(false)
+        return
+      }
+      try {
+        const found = await getBudgetById(id)
+        setBudget(found ?? null)
+      } catch {
+        setBudget(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [params])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center p-8">
+        <Loader2Icon className="h-6 w-6 animate-spin text-slate-400" />
+      </div>
+    )
+  }
 
   if (!budget) {
     return (

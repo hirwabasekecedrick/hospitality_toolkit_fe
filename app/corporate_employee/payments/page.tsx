@@ -1,20 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowDownLeftIcon,
   ReceiptTextIcon,
   AlertCircleIcon,
+  Loader2Icon,
 } from "lucide-react";
 import { CorporateEmployeePaymentWizard } from "@/components/corporate_employee/payment-wizard";
 import {
   getAllTransactions,
-  addTransaction,
-  SERVICE_PROVIDERS,
   type CorporateEmployeeTransaction,
 } from "@/lib/corporateEmployeeTransactions";
-
 function formatAmount(amount: number) {
   return `RWF ${amount.toLocaleString()}`;
 }
@@ -41,7 +39,21 @@ export default function Page() {
   const [showWizard, setShowWizard] = useState(false);
   const [transactionsData, setTransactionsData] = useState<
     CorporateEmployeeTransaction[]
-  >(() => [...getAllTransactions()]);
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getAllTransactions();
+        setTransactionsData(data);
+      } catch {
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
   const filteredTransactions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -79,42 +91,17 @@ export default function Page() {
     return Array.from(map.values()).slice(0, 5);
   }, [transactionsData]);
 
-  const handlePaymentConfirmed = (payment: {
-    hotelId: string;
-    amount: number;
-  }) => {
-    const matchedProvider = SERVICE_PROVIDERS.find(
-      (provider) =>
-        provider.id.toLowerCase() === payment.hotelId.toLowerCase() ||
-        provider.name.toLowerCase().includes(payment.hotelId.toLowerCase()),
-    );
-
-    const newTransaction: CorporateEmployeeTransaction = {
-      id: `TXN-${Date.now()}`,
-      title: `Hotel payment via QR ${payment.hotelId}`,
-      datetime: "Just now",
-      amount: payment.amount,
-      status: "Settled",
-      statusVariant: "success",
-      icon: "receipt",
-      userId: "USER-001",
-      serviceProviderId:
-        matchedProvider?.id ?? SERVICE_PROVIDERS[0]?.id ?? "PROV-001",
-      paymentMethod: "QR payment",
-      reference: `QR-${Date.now()}`,
-      details:
-        "Completed hotel payment initiated from the corporate employee payment wizard.",
-      clientName: "Corporate Traveler",
-      clientOrg: `Hotel ${payment.hotelId}`,
-    };
-
-    addTransaction(newTransaction);
-    setTransactionsData([...getAllTransactions()]);
-    setPaymentDescription(
-      `${newTransaction.clientOrg} • ${formatAmount(newTransaction.amount)}`,
-    );
+  const handlePaymentComplete = async (result: { hotelName: string; amount: number }) => {
+    setShowWizard(false);
+    const data = await getAllTransactions();
+    setTransactionsData(data);
+    setPaymentDescription(`${result.hotelName} • ${formatAmount(result.amount)}`);
     setPaymentConfirmed(true);
   };
+
+  if (loading) {
+    return <div className="flex justify-center p-8"><Loader2Icon className="h-6 w-6 animate-spin text-slate-400" /></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -158,7 +145,8 @@ export default function Page() {
           </div>
         ) : (
           <CorporateEmployeePaymentWizard
-            onPaymentConfirmed={handlePaymentConfirmed}
+            onComplete={handlePaymentComplete}
+            onCancel={() => setShowWizard(false)}
           />
         )}
       </div>

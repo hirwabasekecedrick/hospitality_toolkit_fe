@@ -1,3 +1,5 @@
+import { api } from "./api-client"
+
 export type CorporateEmployeeUser = {
   id: string
   name: string
@@ -57,230 +59,140 @@ export type CorporateEmployeeNotification = {
   transactionId?: string
 }
 
-export const USERS: CorporateEmployeeUser[] = [
-  {
-    id: "USER-001",
-    name: "John Doe",
-    email: "john.doe@bkgroup.com",
-    phone: "+250 788 123 456",
-    role: "Corporate Traveler",
-    department: "Business Development",
-  },
-  {
-    id: "USER-002",
-    name: "Alice Smith",
-    email: "alice.smith@mtn.rw",
-    phone: "+250 788 654 321",
-    role: "Account Manager",
-    department: "Sales",
-  },
-  {
-    id: "USER-003",
-    name: "Corporate Team",
-    email: "team@rwandair.com",
-    phone: "+250 788 800 900",
-    role: "Events Coordinator",
-    department: "Operations",
-  },
-  {
-    id: "USER-004",
-    name: "Sarah Jones",
-    email: "sarah.jones@bralirwa.com",
-    phone: "+250 788 778 899",
-    role: "Guest Relations",
-    department: "Hospitality",
-  },
-]
-
-export const SERVICE_PROVIDERS: ServiceProvider[] = [
-  {
-    id: "PROV-001",
-    name: "Kigali Marriott Hotel",
-    category: "Hotel",
-    description: "A premium hotel with conference facilities, dining, and wellness services in Kigali.",
-    rating: 4.7,
-    location: {
-      latitude: -1.9444,
-      longitude: 30.0619,
-      address: "KN 5 Rd, Kigali, Rwanda",
-    },
-    contact: {
-      phone: "+250 788 100 101",
-      email: "reservations@marriottkigali.rw",
-    },
-  },
-  {
-    id: "PROV-002",
-    name: "Radisson Blu Hotel",
-    category: "Hotel",
-    description: "A business-class hotel offering modern meeting rooms and restaurant services.",
-    rating: 4.5,
-    location: {
-      latitude: -1.9522,
-      longitude: 30.0606,
-      address: "KG 7 Ave, Kigali, Rwanda",
-    },
-    contact: {
-      phone: "+250 788 200 202",
-      email: "info@radissonblukigali.rw",
-    },
-  },
-  {
-    id: "PROV-003",
-    name: "Serena Hotel Kigali",
-    category: "Hotel",
-    description: "Luxury accommodations with event spaces, spa, and restaurant services.",
-    rating: 4.8,
-    location: {
-      latitude: -1.9491,
-      longitude: 30.0701,
-      address: "KN 4 Ave, Kigali, Rwanda",
-    },
-    contact: {
-      phone: "+250 788 300 303",
-      email: "contact@serenakigali.rw",
-    },
-  },
-]
-
-export const TRANSACTIONS: CorporateEmployeeTransaction[] = [
-  {
-    id: "TXN-9482",
-    title: "Room charge",
-    datetime: "Today, 2:45 PM",
-    amount: 185000,
-    status: "Settled",
-    statusVariant: "success",
-    icon: "receipt",
-    userId: "USER-001",
-    serviceProviderId: "PROV-001",
-    paymentMethod: "Corporate card",
-    reference: "RC-20240514-9482",
-    details: "Hotel room charge for a one-night stay, including minibar and room service.",
-    clientName: "John Doe",
-    clientOrg: "BK Group",
-  },
-  {
-    id: "TXN-9481",
-    title: "Food & Beverage",
-    datetime: "Today, 1:15 PM",
-    amount: 42500,
-    status: "Settled",
-    statusVariant: "success",
-    icon: "receipt",
-    userId: "USER-002",
-    serviceProviderId: "PROV-002",
-    paymentMethod: "Corporate card",
-    reference: "FNB-20240514-9481",
-    details: "Lunch and refreshments for a client meeting in the hotel restaurant.",
-    clientName: "Alice Smith",
-    clientOrg: "MTN Rwanda",
-  },
-  {
-    id: "TXN-9480",
-    title: "Breakfast",
-    datetime: "Yesterday, 4:30 PM",
-    amount: 280000,
-    status: "Pending",
-    statusVariant: "neutral",
-    icon: "arrow",
-    userId: "USER-003",
-    serviceProviderId: "PROV-001",
-    paymentMethod: "Corporate card",
-    reference: "BR-20240513-9480",
-    details: "Breakfast with AV and catering services for a 3-hour event.",
-    clientName: "Corporate Team",
-    clientOrg: "RwandAir",
-  },
-  {
-    id: "TXN-9479",
-    title: "Spa services",
-    datetime: "Yesterday, 11:20 AM",
-    amount: 85000,
-    status: "Disputed",
-    statusVariant: "warning",
-    icon: "alert",
-    userId: "USER-004",
-    serviceProviderId: "PROV-003",
-    paymentMethod: "Corporate card",
-    reference: "SPA-20240513-9479",
-    details: "Spa and wellness package billed to the corporate card for wellness reimbursement.",
-    clientName: "Sarah Jones",
-    clientOrg: "Bralirwa",
-  },
-]
-
-export const NOTIFICATIONS: CorporateEmployeeNotification[] = [
-  {
-    id: "NOTIF-001",
-    title: "Payment approved",
-    subtitle: "Room charge for John Doe",
-    datetime: "Today, 2:46 PM",
-    type: "Payment",
-    message: "Your room charge transaction has been approved and settled. The corporate card has been debited successfully.",
-    actionLabel: "View transaction",
-    actionUrl: "/corporate_employee/payments/TXN-9482",
-    transactionId: "TXN-9482",
-  },
-  {
-    id: "NOTIF-002",
-    title: "Pending approval",
-    subtitle: "Breakfast",
-    datetime: "Yesterday, 4:35 PM",
-    type: "Approval",
-    message: "Your Breakfast request is pending approval by the finance team. You will receive an update shortly.",
-    actionLabel: "Review details",
-    actionUrl: "/corporate_employee/notifications/NOTIF-002",
-  },
-  {
-    id: "NOTIF-003",
-    title: "Dispute opened",
-    subtitle: "Spa services",
-    datetime: "Yesterday, 11:25 AM",
-    type: "Dispute",
-    message: "A dispute request was submitted for the spa services transaction. Review the transaction and contact support if needed.",
-    actionLabel: "See dispute",
-    actionUrl: "/corporate_employee/notifications/NOTIF-003",
-    transactionId: "TXN-9479",
-  },
-]
-
-export function getUserById(id: string) {
-  return USERS.find((user) => user.id === id)
+interface ApiTransaction {
+  id: string
+  amount: number
+  status: string
+  description?: string
+  reference?: string
+  paymentMethod?: string
+  createdAt: string
+  userId?: string
+  serviceProviderId?: string
+  cardId?: string
+  user?: { id: string; firstName: string; lastName: string; email: string }
+  serviceProvider?: {
+    id: string
+    name: string
+    category?: string
+    description?: string
+    phone?: string
+    email?: string
+    latitude?: number
+    longitude?: number
+    address?: string
+    rating?: number
+  }
+  card?: { id: string; last4?: string; type?: string }
 }
 
-export function getServiceProviderById(id: string) {
-  return SERVICE_PROVIDERS.find((provider) => provider.id === id)
+interface ApiNotification {
+  id: string
+  title: string
+  message?: string
+  type?: string
+  createdAt: string
+  readAt?: string | null
+  transactionId?: string
 }
 
-export function getTransactionById(id: string) {
-  return TRANSACTIONS.find((transaction) => transaction.id === id)
-}
-
-export function getTransactionDetails(id: string) {
-  const transaction = getTransactionById(id)
-  if (!transaction) return undefined
+function mapTransaction(t: ApiTransaction): CorporateEmployeeTransaction {
+  const status = t.status.charAt(0).toUpperCase() + t.status.slice(1).toLowerCase()
+  const statusVariant: "success" | "warning" | "neutral" =
+    t.status === "SETTLED" ? "success" :
+    t.status === "DISPUTED" ? "warning" : "neutral"
+  const icon: "receipt" | "arrow" | "alert" =
+    t.status === "SETTLED" ? "receipt" :
+    t.status === "PENDING" ? "arrow" : "alert"
+  const clientName = t.user ? `${t.user.firstName} ${t.user.lastName}` : "Unknown"
+  const clientOrg = t.user?.email || ""
 
   return {
-    ...transaction,
-    user: getUserById(transaction.userId),
-    serviceProvider: getServiceProviderById(transaction.serviceProviderId),
+    id: t.id,
+    title: t.description || "Transaction",
+    datetime: t.createdAt ? new Date(t.createdAt).toLocaleString() : "",
+    amount: t.amount,
+    status,
+    statusVariant,
+    icon,
+    userId: t.userId || "",
+    serviceProviderId: t.serviceProviderId || "",
+    paymentMethod: t.paymentMethod || "Corporate card",
+    reference: t.reference || `REF-${t.id.slice(0, 8)}`,
+    details: t.description || "",
+    clientName,
+    clientOrg,
   }
 }
 
-export function getNotificationById(id: string) {
-  return NOTIFICATIONS.find((notification) => notification.id === id)
+function mapNotification(n: ApiNotification): CorporateEmployeeNotification {
+  return {
+    id: n.id,
+    title: n.title,
+    subtitle: n.message?.slice(0, 80) || "",
+    datetime: n.createdAt ? new Date(n.createdAt).toLocaleString() : "",
+    type: n.type || "Info",
+    message: n.message || "",
+    transactionId: n.transactionId,
+  }
 }
 
-export function getAllTransactions() {
-  return TRANSACTIONS
+export async function getAllTransactions(): Promise<CorporateEmployeeTransaction[]> {
+  const data = await api.get<ApiTransaction[]>("/payments")
+  return data.map(mapTransaction)
 }
 
-export function addTransaction(transaction: CorporateEmployeeTransaction) {
-  TRANSACTIONS.unshift(transaction)
-  return TRANSACTIONS
+export async function getTransactionById(id: string): Promise<CorporateEmployeeTransaction | null> {
+  try {
+    const data = await api.get<ApiTransaction>(`/payments/${id}`)
+    return mapTransaction(data)
+  } catch {
+    return null
+  }
 }
 
-export function getAllNotifications() {
-  return NOTIFICATIONS
+export async function getTransactionDetails(id: string) {
+  try {
+    const data = await api.get<ApiTransaction>(`/payments/${id}`)
+    return {
+      ...mapTransaction(data),
+      user: data.user ? { id: data.user.id, name: `${data.user.firstName} ${data.user.lastName}`, email: data.user.email, phone: "", role: "", department: "" } : undefined,
+      serviceProvider: data.serviceProvider ? {
+        id: data.serviceProvider.id,
+        name: data.serviceProvider.name,
+        category: data.serviceProvider.category || "",
+        description: data.serviceProvider.description || "",
+        rating: data.serviceProvider.rating || 0,
+        location: {
+          latitude: data.serviceProvider.latitude || 0,
+          longitude: data.serviceProvider.longitude || 0,
+          address: data.serviceProvider.address || "",
+        },
+        contact: {
+          phone: data.serviceProvider.phone || "",
+          email: data.serviceProvider.email || "",
+        },
+      } : undefined,
+    }
+  } catch {
+    return undefined
+  }
+}
+
+export async function addTransaction(_transaction: CorporateEmployeeTransaction): Promise<CorporateEmployeeTransaction[]> {
+  return getAllTransactions()
+}
+
+export async function getAllNotifications(): Promise<CorporateEmployeeNotification[]> {
+  const data = await api.get<ApiNotification[]>("/notifications")
+  return data.map(mapNotification)
+}
+
+export async function getNotificationById(id: string): Promise<CorporateEmployeeNotification | null> {
+  try {
+    const data = await api.get<ApiNotification>(`/notifications/${id}`)
+    return mapNotification(data)
+  } catch {
+    return null
+  }
 }

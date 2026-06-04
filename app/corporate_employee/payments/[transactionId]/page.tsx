@@ -10,7 +10,7 @@ function formatAmount(amount: number) {
 
 export default async function Page({ params }: Props) {
   const { transactionId } = await params;
-  const transaction = getTransactionDetails(transactionId);
+  const transaction = await getTransactionDetails(transactionId);
 
   if (!transaction) {
     return (

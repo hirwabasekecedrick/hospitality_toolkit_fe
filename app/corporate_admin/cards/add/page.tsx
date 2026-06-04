@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { addCard, type Card } from "@/lib/cardsStore"
+import { toast } from "sonner"
+import { addCard } from "@/lib/cardsStore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -82,51 +83,31 @@ export default function AddCardPage() {
     setPurpose(value)
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    const createdAt = Date.now()
-    const issueType = cardType === "per diem" ? "Per diem" : "Corporate expense"
+    const backendType = cardType === "per diem" ? "PER_DIEM" : "CORPORATE_EXPENSE"
+    const employeeIds = selectedEmployees.map((e) => e.id)
 
-    const buildCard = (
-      holder: { id?: string; name: string },
-      employeesForCard: { id: string; name: string }[] = []
-    ): Card => {
-      const id = `${createdAt}-${holder.id ?? "unassigned"}-${Math.floor(1000 + Math.random() * 9000)}`
-      const last4 = Math.floor(1000 + Math.random() * 9000).toString()
-
-      return {
-        id,
-        type: "Virtual",
-        issueType,
-        distributed: issueType === "Corporate expense" ? distributeToEmployees : false,
-        cardholder: holder.name,
-        cardholderId: holder.id,
-        employees: employeesForCard,
-        purpose,
-        validityType,
+    try {
+      await addCard({
+        type: backendType as "PER_DIEM" | "CORPORATE_EXPENSE",
+        cardPassword: "1234",
+        limit: amount ? Number(amount) : undefined,
+        amount: amount ? Number(amount) : undefined,
+        validityType: validityType === "range" ? "RANGE" : "SINGLE",
         validFrom: validityType === "range" ? validFrom : undefined,
         validUntil: validityType === "range" ? validUntil : undefined,
-        last4,
-        status: "Active",
-        limit: amount ? `RWF ${amount}` : undefined,
-        amount: amount ? Number(amount) : undefined,
-        lastUsed: "Never",
-      }
+        purpose: purpose || undefined,
+        distributed: cardType === "corporate expense" ? distributeToEmployees : false,
+        teamLeaderId: teamLeader?.id,
+        employeeIds: cardType === "per diem" ? (selectedEmployees.length > 0 ? [selectedEmployees[0].id] : undefined) : employeeIds,
+      })
+      setSubmitted(true)
+      router.push("/corporate_admin/cards")
+    } catch {
+      toast.error("Failed to create card")
     }
-
-    if (cardType === "per diem") {
-      const employee = selectedEmployees[0]
-      addCard(
-        buildCard(employee ? { id: employee.id, name: employee.name } : { name: "Unassigned" }, employee ? [employee] : [])
-      )
-    } else {
-      const leader = teamLeader ?? { name: "Team leader" }
-      addCard(buildCard(leader, selectedEmployees))
-    }
-
-    setSubmitted(true)
-    router.push("/corporate_admin/cards")
   }
 
   return (

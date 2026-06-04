@@ -1,7 +1,7 @@
 import * as React from "react"
-import { getRedeemById, RedeemDetail, RedeemTransaction } from "@/lib/redeems"
+import { getRedeemById, type RedeemDetail, type RedeemTransaction } from "@/lib/redeems"
 
-type Props = { params: { slug: string } }
+type Props = { params: Promise<{ slug: string }> }
 
 const statusStyles: Record<string, string> = {
   Pending: "bg-amber-100 text-amber-800",
@@ -11,26 +11,19 @@ const statusStyles: Record<string, string> = {
   Unknown: "bg-slate-100 text-slate-800",
 }
 
-export default function Page({ params }: Props) {
-  const slug = params.slug
-  const data: RedeemDetail = getRedeemById(slug) ?? {
-    id: slug,
-    title: `RXa33049e0 ${slug}`,
-    amount: 675.0,
-    schedule: "Every day",
-    status: "Processing",
-    createdAt: "2026-05-22",
-    nextRun: "2026-05-23 07:00",
-    requestedBy: "Mock transaction run",
-    paymentMethod: "Bank transfer",
-    externalReference: "PREVIEW-001",
-    description: "This redeem previews a daily payout by summing mock transactions for the selected time window.",
-    transactionCount: 3,
-    transactions: [
-      { id: "t-mock-001", amount: 175.0, guest: "Mock Guest A", date: "2026-05-22", status: "Processing", property: "Mock Hotel Alpha", reference: "MOCK-001" },
-      { id: "t-mock-002", amount: 225.0, guest: "Mock Guest B", date: "2026-05-22", status: "Processing", property: "Mock Hotel Beta", reference: "MOCK-002" },
-      { id: "t-mock-003", amount: 275.0, guest: "Mock Guest C", date: "2026-05-22", status: "Processing", property: "Mock Hotel Gamma", reference: "MOCK-003" },
-    ],
+export default async function Page({ params }: Props) {
+  const { slug } = await params
+  const data: RedeemDetail | undefined = await getRedeemById(slug)
+
+  if (!data) {
+    return (
+      <div className="space-y-6 px-0">
+        <div className="rounded-3xl bg-white p-6">
+          <h1 className="text-2xl font-semibold text-slate-950">Redeem not found</h1>
+          <p className="mt-1 text-sm text-slate-500">The redeem with ID {slug} does not exist.</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -46,7 +39,7 @@ export default function Page({ params }: Props) {
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="text-sm text-slate-600">Amount</div>
-            <div className="mt-1 text-2xl font-semibold text-slate-950">${data.amount.toFixed(2)}</div>
+            <div className="mt-1 text-2xl font-semibold text-slate-950">RWF {data.amount.toLocaleString()}</div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <div className="text-sm text-slate-600">Schedule</div>
@@ -98,7 +91,7 @@ export default function Page({ params }: Props) {
                     <td className="px-4 py-4 font-medium text-slate-900">{t.id}</td>
                     <td className="px-4 py-4 text-slate-700">{t.guest}</td>
                     <td className="px-4 py-4 text-slate-700">{t.property}</td>
-                    <td className="px-4 py-4 text-slate-700">${t.amount.toFixed(2)}</td>
+                    <td className="px-4 py-4 text-slate-700">RWF {t.amount.toLocaleString()}</td>
                     <td className="px-4 py-4 text-slate-700">{t.date}</td>
                     <td className="px-4 py-4">
                       <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
