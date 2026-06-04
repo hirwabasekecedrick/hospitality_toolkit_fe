@@ -43,8 +43,8 @@ export type CorporateEmployeeTransaction = {
   paymentMethod: string
   reference: string
   details: string
-  clientName: string
-  clientOrg: string
+  employeeName: string
+  organization: string
 }
 
 export type CorporateEmployeeNotification = {
@@ -83,6 +83,8 @@ interface ApiTransaction {
     address?: string
     rating?: number
   }
+  clientName?: string
+  clientOrg?: string
   card?: { id: string; last4?: string; type?: string }
 }
 
@@ -104,8 +106,8 @@ function mapTransaction(t: ApiTransaction): CorporateEmployeeTransaction {
   const icon: "receipt" | "arrow" | "alert" =
     t.status === "SETTLED" ? "receipt" :
     t.status === "PENDING" ? "arrow" : "alert"
-  const clientName = t.user ? `${t.user.firstName} ${t.user.lastName}` : "Unknown"
-  const clientOrg = t.user?.email || ""
+  const employeeName = t.user ? `${t.user.firstName} ${t.user.lastName}` : "Unknown"
+  const organization = t.clientOrg || ""
 
   return {
     id: t.id,
@@ -120,8 +122,8 @@ function mapTransaction(t: ApiTransaction): CorporateEmployeeTransaction {
     paymentMethod: t.paymentMethod || "Corporate card",
     reference: t.reference || `REF-${t.id.slice(0, 8)}`,
     details: t.description || "",
-    clientName,
-    clientOrg,
+    employeeName,
+    organization,
   }
 }
 
@@ -139,6 +141,12 @@ function mapNotification(n: ApiNotification): CorporateEmployeeNotification {
 
 export async function getAllTransactions(): Promise<CorporateEmployeeTransaction[]> {
   const data = await api.get<ApiTransaction[]>("/payments")
+  return data.map(mapTransaction)
+}
+
+export async function getProviderTransactions(status?: string): Promise<CorporateEmployeeTransaction[]> {
+  const query = status ? `?status=${encodeURIComponent(status)}` : ""
+  const data = await api.get<ApiTransaction[]>(`/payments/provider${query}`)
   return data.map(mapTransaction)
 }
 

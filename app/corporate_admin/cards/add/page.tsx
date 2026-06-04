@@ -1,27 +1,38 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { toast } from "sonner"
-import { addCard } from "@/lib/cardsStore"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Command, CommandGroup, CommandInput, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ChevronLeftIcon, PlusIcon, UserIcon } from "lucide-react"
+import { useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
+import { addCard } from "@/lib/cardsStore";
+import { getEmployees } from "@/lib/usersStore";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ChevronLeftIcon, PlusIcon, UserIcon } from "lucide-react";
 
-const employees = [
-  { id: "emp-1", name: "Amina Kamali", role: "Sales" },
-  { id: "emp-2", name: "Samuel Nkurunziza", role: "Operations" },
-  { id: "emp-3", name: "Grace Uwase", role: "Finance" },
-  { id: "emp-4", name: "Eric Mutesi", role: "Marketing" },
-  { id: "emp-5", name: "Ruth Bizimana", role: "Procurement" },
-  { id: "emp-6", name: "John Mwizerwa", role: "IT" },
-]
+// employees will be fetched from backend
 
 const defaultPurposes = [
   "Travel",
@@ -29,68 +40,101 @@ const defaultPurposes = [
   "Office Supplies",
   "Events",
   "Training",
-]
+];
 
 export default function AddCardPage() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [selectedEmployees, setSelectedEmployees] = useState<{ id: string; name: string }[]>([])
-  const [employeeQuery, setEmployeeQuery] = useState("")
-  const [cardType, setCardType] = useState<"per diem" | "corporate expense">("per diem")
-  const handleCardTypeChange = (value: string) => setCardType(value as "per diem" | "corporate expense")
-  const [teamLeader, setTeamLeader] = useState<{ id: string; name: string } | null>(null)
-  const [distributeToEmployees, setDistributeToEmployees] = useState(true)
-  const [purpose, setPurpose] = useState("")
-  const [amount, setAmount] = useState("")
-  const [validityType, setValidityType] = useState<"single" | "range">("single")
-  const [validFrom, setValidFrom] = useState("")
-  const [validUntil, setValidUntil] = useState("")
-  const [notes, setNotes] = useState("")
-  const [submitted, setSubmitted] = useState(false)
+  const [selectedEmployees, setSelectedEmployees] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [employeeQuery, setEmployeeQuery] = useState("");
+  const [cardType, setCardType] = useState<"per diem" | "corporate expense">(
+    "per diem",
+  );
+  const handleCardTypeChange = (value: string) =>
+    setCardType(value as "per diem" | "corporate expense");
+  const [teamLeader, setTeamLeader] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [employees, setEmployees] = useState<
+    { id: string; name: string; role?: string }[]
+  >([]);
+  const [distributeToEmployees, setDistributeToEmployees] = useState(true);
+  const [purpose, setPurpose] = useState("");
+  const [amount, setAmount] = useState("");
+  const [validityType, setValidityType] = useState<"single" | "range">(
+    "single",
+  );
+  const [validFrom, setValidFrom] = useState("");
+  const [validUntil, setValidUntil] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const filteredEmployees = useMemo(() => {
-    const q = employeeQuery.trim().toLowerCase()
-    const selectedIds = new Set(selectedEmployees.map((s) => s.id))
-    return employees.filter(
-      (employee) =>
+    const q = employeeQuery.trim().toLowerCase();
+    const selectedIds = new Set(selectedEmployees.map((s) => s.id));
+    return employees.filter((employee) => {
+      const role = (employee.role || "").toLowerCase();
+      return (
         !selectedIds.has(employee.id) &&
-        (employee.name.toLowerCase().includes(q) || employee.role.toLowerCase().includes(q))
-    )
-  }, [employeeQuery, selectedEmployees])
+        (employee.name.toLowerCase().includes(q) || role.includes(q))
+      );
+    });
+  }, [employeeQuery, selectedEmployees]);
 
   const addEmployee = (value: { id: string; name: string } | string) => {
-    if (!value) return
-    if (cardType === "per diem" && selectedEmployees.length >= 1) return
+    if (!value) return;
+    if (cardType === "per diem" && selectedEmployees.length >= 1) return;
 
     if (typeof value === "string") {
-      const id = `custom-${Date.now()}`
-      setSelectedEmployees((current) => [...current, { id, name: value }])
-      setEmployeeQuery("")
-      return
+      const id = `custom-${Date.now()}`;
+      setSelectedEmployees((current) => [...current, { id, name: value }]);
+      setEmployeeQuery("");
+      return;
     }
 
     setSelectedEmployees((current) =>
-      current.some((c) => c.id === value.id) ? current : [...current, { id: value.id, name: value.name }]
-    )
-    setEmployeeQuery("")
-  }
+      current.some((c) => c.id === value.id)
+        ? current
+        : [...current, { id: value.id, name: value.name }],
+    );
+    setEmployeeQuery("");
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    getEmployees("CORPORATE_EMPLOYEE")
+      .then((res) => {
+        if (!mounted) return;
+        setEmployees(res);
+      })
+      .catch(() => {
+        toast.error("Failed to load employees");
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const removeEmployee = (id: string) => {
-    setSelectedEmployees((current) => current.filter((item) => item.id !== id))
-  }
+    setSelectedEmployees((current) => current.filter((item) => item.id !== id));
+  };
 
   const handlePurposeChip = (value: string) => {
-    setPurpose(value)
-  }
+    setPurpose(value);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
 
-    const backendType = cardType === "per diem" ? "PER_DIEM" : "CORPORATE_EXPENSE"
-    const employeeIds = selectedEmployees.map((e) => e.id)
+    const backendType =
+      cardType === "per diem" ? "PER_DIEM" : "CORPORATE_EXPENSE";
+    const employeeIds = selectedEmployees.map((e) => e.id);
 
     try {
-      await addCard({
+      const created = await addCard({
         type: backendType as "PER_DIEM" | "CORPORATE_EXPENSE",
         cardPassword: "1234",
         limit: amount ? Number(amount) : undefined,
@@ -99,16 +143,29 @@ export default function AddCardPage() {
         validFrom: validityType === "range" ? validFrom : undefined,
         validUntil: validityType === "range" ? validUntil : undefined,
         purpose: purpose || undefined,
-        distributed: cardType === "corporate expense" ? distributeToEmployees : false,
+        distributed:
+          cardType === "corporate expense" ? distributeToEmployees : false,
         teamLeaderId: teamLeader?.id,
-        employeeIds: cardType === "per diem" ? (selectedEmployees.length > 0 ? [selectedEmployees[0].id] : undefined) : employeeIds,
-      })
-      setSubmitted(true)
-      router.push("/corporate_admin/cards")
+        employeeIds:
+          cardType === "per diem"
+            ? selectedEmployees.length > 0
+              ? [selectedEmployees[0].id]
+              : undefined
+            : employeeIds,
+      });
+      setSubmitted(true);
+      if ((created as any).defaultPassword) {
+        toast.success(
+          `Card created — default password: ${(created as any).defaultPassword}`,
+        );
+      } else {
+        toast.success("Card created successfully");
+      }
+      router.push("/corporate_admin/cards");
     } catch {
-      toast.error("Failed to create card")
+      toast.error("Failed to create card");
     }
-  }
+  };
 
   return (
     <div className="space-y-6 p-2 sm:p-0">
@@ -116,7 +173,9 @@ export default function AddCardPage() {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <div>
-              <h1 className="text-3xl font-semibold text-slate-950">Issue New Card</h1>
+              <h1 className="text-3xl font-semibold text-slate-950">
+                Issue New Card
+              </h1>
             </div>
           </div>
         </div>
@@ -126,126 +185,157 @@ export default function AddCardPage() {
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-6">
-            <div className="space-y-3">
-              <Tabs value={cardType} onValueChange={handleCardTypeChange} className="rounded-3xl border border-slate-200 bg-slate-50 p-2">
-                <TabsList>
-                  <TabsTrigger value="per diem" className="rounded-xl px-4 py-3">Per diem</TabsTrigger>
-                  <TabsTrigger value="corporate expense" className="rounded-xl px-4 py-3">Corporate expense</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              <p className="text-sm text-slate-500">
-                {cardType === "per diem"
-                  ? "Issue a card for a single employee to manage their own payments."
-                  : "Create a corporate expense card for a mission team, assign a leader, and optionally distribute access to the selected members."}
-              </p>
-            </div>
-
-            {cardType === "corporate expense" ? (
-              <div className="space-y-2">
-                <Label>Team leader</Label>
-                <select
-                  value={teamLeader?.id ?? ""}
-                  onChange={(e) => {
-                    const leader = employees.find((emp) => emp.id === e.target.value) ?? null
-                    setTeamLeader(leader)
-                  }}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
+              <div className="space-y-3">
+                <Tabs
+                  value={cardType}
+                  onValueChange={handleCardTypeChange}
+                  className="rounded-3xl border border-slate-200 bg-slate-50 p-2"
                 >
-                  <option value="">Select team leader</option>
-                  {employees.map((employee) => (
-                    <option key={employee.id} value={employee.id}>
-                      {employee.name} • {employee.role}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : null}
-
-            <div className="space-y-2">
-              <Label>{cardType === "per diem" ? "Employee / Cardholder" : "Selected team members"}</Label>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <div className="flex flex-wrap gap-2">
-                  {selectedEmployees.map((employee) => (
-                    <button
-                      type="button"
-                      key={employee.id}
-                      onClick={() => removeEmployee(employee.id)}
-                      className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700 transition hover:border-slate-400"
+                  <TabsList>
+                    <TabsTrigger
+                      value="per diem"
+                      className="rounded-xl px-4 py-3"
                     >
-                      {employee.name}
-                      <span className="text-slate-400">×</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-3">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
-                        <UserIcon className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm text-slate-500">Search employees or type a name</span>
-                      </div>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full max-w-md p-2">
-                      <Command className="h-[320px]">
-                        <CommandInput
-                          placeholder="Search employees..."
-                          value={employeeQuery}
-                          onValueChange={(value) => setEmployeeQuery(value)}
-                        />
-                        <CommandList>
-                          {filteredEmployees.length > 0 ? (
-                            <CommandGroup heading="Employees">
-                              {filteredEmployees.map((employee) => (
-                                <CommandItem
-                                  key={employee.id}
-                                  onSelect={() => addEmployee(employee)}
-                                >
-                                  <span>{employee.name}</span>
-                                  <span className="ml-auto text-xs text-slate-400">{employee.role}</span>
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          ) : (
-                            <CommandEmpty>No matching employees.</CommandEmpty>
-                          )}
-                        </CommandList>
-                      </Command>
-                      <div className="mt-2 flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            if (employeeQuery.trim()) {
-                              addEmployee(employeeQuery.trim())
-                            }
-                          }}
-                          className="flex-1"
-                        >
-                          Add "{employeeQuery || "custom name"}"
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-            </div>
-
-            {cardType === "corporate expense" ? (
-              <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={distributeToEmployees}
-                    onChange={(e) => setDistributeToEmployees(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                  />
-                  Distribute the corporate expense card to the selected employees
-                </label>
+                      Per diem
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="corporate expense"
+                      className="rounded-xl px-4 py-3"
+                    >
+                      Corporate expense
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
                 <p className="text-sm text-slate-500">
-                  When distributed, selected employees will see the remaining balance and transactions. If not distributed, only the team leader will have full visibility.
+                  {cardType === "per diem"
+                    ? "Issue a card for a single employee to manage their own payments."
+                    : "Create a corporate expense card for a mission team, assign a leader, and optionally distribute access to the selected members."}
                 </p>
               </div>
-            ) : null}
+
+              {cardType === "corporate expense" ? (
+                <div className="space-y-2">
+                  <Label>Team leader</Label>
+                  <select
+                    value={teamLeader?.id ?? ""}
+                    onChange={(e) => {
+                      const leader =
+                        employees.find((emp) => emp.id === e.target.value) ??
+                        null;
+                      setTeamLeader(leader);
+                    }}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
+                  >
+                    <option value="">Select team leader</option>
+                    {employees.map((employee) => (
+                      <option key={employee.id} value={employee.id}>
+                        {employee.name} • {employee.role}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
+
+              <div className="space-y-2">
+                <Label>
+                  {cardType === "per diem"
+                    ? "Employee / Cardholder"
+                    : "Selected team members"}
+                </Label>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEmployees.map((employee) => (
+                      <button
+                        type="button"
+                        key={employee.id}
+                        onClick={() => removeEmployee(employee.id)}
+                        className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700 transition hover:border-slate-400"
+                      >
+                        {employee.name}
+                        <span className="text-slate-400">×</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-3">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
+                          <UserIcon className="h-4 w-4 text-slate-500" />
+                          <span className="text-sm text-slate-500">
+                            Search employees or type a name
+                          </span>
+                        </div>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full max-w-md p-2">
+                        <Command className="h-[320px]">
+                          <CommandInput
+                            placeholder="Search employees..."
+                            value={employeeQuery}
+                            onValueChange={(value) => setEmployeeQuery(value)}
+                          />
+                          <CommandList>
+                            {filteredEmployees.length > 0 ? (
+                              <CommandGroup heading="Employees">
+                                {filteredEmployees.map((employee) => (
+                                  <CommandItem
+                                    key={employee.id}
+                                    onSelect={() => addEmployee(employee)}
+                                  >
+                                    <span>{employee.name}</span>
+                                    <span className="ml-auto text-xs text-slate-400">
+                                      {employee.role}
+                                    </span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            ) : (
+                              <CommandEmpty>
+                                No matching employees.
+                              </CommandEmpty>
+                            )}
+                          </CommandList>
+                        </Command>
+                        <div className="mt-2 flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              if (employeeQuery.trim()) {
+                                addEmployee(employeeQuery.trim());
+                              }
+                            }}
+                            className="flex-1"
+                          >
+                            Add "{employeeQuery || "custom name"}"
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+              </div>
+
+              {cardType === "corporate expense" ? (
+                <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={distributeToEmployees}
+                      onChange={(e) =>
+                        setDistributeToEmployees(e.target.checked)
+                      }
+                      className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    Distribute the corporate expense card to the selected
+                    employees
+                  </label>
+                  <p className="text-sm text-slate-500">
+                    When distributed, selected employees will see the remaining
+                    balance and transactions. If not distributed, only the team
+                    leader will have full visibility.
+                  </p>
+                </div>
+              ) : null}
 
               <div className="space-y-2">
                 <Label htmlFor="purpose">Purpose</Label>
@@ -262,7 +352,9 @@ export default function AddCardPage() {
                       type="button"
                       onClick={() => handlePurposeChip(item)}
                       className={`rounded-2xl border px-3 py-2 text-left text-sm transition ${
-                        purpose === item ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                        purpose === item
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                       }`}
                     >
                       {item}
@@ -284,7 +376,12 @@ export default function AddCardPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Validity</Label>
-                  <Select value={validityType} onValueChange={(value) => setValidityType(value as "single" | "range") }>
+                  <Select
+                    value={validityType}
+                    onValueChange={(value) =>
+                      setValidityType(value as "single" | "range")
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Choose validity" />
                     </SelectTrigger>
@@ -319,7 +416,8 @@ export default function AddCardPage() {
                 </div>
               ) : (
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                  Single use cards are valid for exactly one approved transaction.
+                  Single use cards are valid for exactly one approved
+                  transaction.
                 </div>
               )}
             </div>
@@ -327,9 +425,12 @@ export default function AddCardPage() {
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-950">Review</h2>
+                  <h2 className="text-lg font-semibold text-slate-950">
+                    Review
+                  </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Confirm the card assignment and validity before creating the card.
+                    Confirm the card assignment and validity before creating the
+                    card.
                   </p>
                 </div>
                 <div className="grid gap-3">
@@ -338,18 +439,25 @@ export default function AddCardPage() {
                     <div className="mt-2 flex flex-wrap gap-2">
                       {selectedEmployees.length > 0 ? (
                         selectedEmployees.map((employee) => (
-                          <span key={employee.id} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">
+                          <span
+                            key={employee.id}
+                            className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700"
+                          >
                             {employee.name}
                           </span>
                         ))
                       ) : (
-                        <span className="text-sm text-slate-500">No employee selected yet.</span>
+                        <span className="text-sm text-slate-500">
+                          No employee selected yet.
+                        </span>
                       )}
                     </div>
                   </div>
                   <div className="rounded-2xl border border-slate-200 bg-white p-4">
                     <p className="text-sm text-slate-500">Purpose</p>
-                    <p className="mt-2 text-sm text-slate-900">{purpose || "Not set yet"}</p>
+                    <p className="mt-2 text-sm text-slate-900">
+                      {purpose || "Not set yet"}
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-slate-200 bg-white p-4">
                     <p className="text-sm text-slate-500">Validity</p>
@@ -357,13 +465,15 @@ export default function AddCardPage() {
                       {validityType === "single"
                         ? "Single use"
                         : validFrom && validUntil
-                        ? `${validFrom} → ${validUntil}`
-                        : "Date range not set"}
+                          ? `${validFrom} → ${validUntil}`
+                          : "Date range not set"}
                     </p>
                   </div>
                   <div className="rounded-2xl border border-slate-200 bg-white p-4">
                     <p className="text-sm text-slate-500">Amount ceiling</p>
-                    <p className="mt-2 text-sm text-slate-900">{amount ? `RWF ${amount}` : "Not set"}</p>
+                    <p className="mt-2 text-sm text-slate-900">
+                      {amount ? `RWF ${amount}` : "Not set"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -372,20 +482,27 @@ export default function AddCardPage() {
 
           {submitted ? (
             <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 text-emerald-700">
-              Card request submitted. You can still adjust the values or navigate back to cards management.
+              Card request submitted. You can still adjust the values or
+              navigate back to cards management.
             </div>
           ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Link href="/corporate_admin/cards" className="inline-flex justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+            <Link
+              href="/corporate_admin/cards"
+              className="inline-flex justify-center rounded-2xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
               Cancel
             </Link>
-            <Button type="submit" className="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-600">
+            <Button
+              type="submit"
+              className="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-600"
+            >
               Create Card
             </Button>
           </div>
         </form>
       </div>
     </div>
-  )
+  );
 }

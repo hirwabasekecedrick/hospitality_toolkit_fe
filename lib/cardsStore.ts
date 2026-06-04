@@ -19,6 +19,7 @@ export type Card = {
   lastUsed?: string
   spent?: number
   teamLeader?: { id: string; firstName: string; lastName: string; email: string }
+  defaultPassword?: string
 }
 
 interface ApiCard {
@@ -80,6 +81,7 @@ function mapCard(apiCard: ApiCard): Card {
     lastUsed,
     spent: apiCard.spent,
     teamLeader: apiCard.teamLeader,
+    defaultPassword: (apiCard as any).defaultPassword,
   }
 }
 

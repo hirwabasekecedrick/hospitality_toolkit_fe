@@ -65,8 +65,8 @@ export default function Page() {
         return (
           txn.id.toLowerCase().includes(query) ||
           txn.title.toLowerCase().includes(query) ||
-          txn.clientName.toLowerCase().includes(query) ||
-          txn.clientOrg.toLowerCase().includes(query) ||
+          (txn.employeeName || "").toLowerCase().includes(query) ||
+          (txn.organization || "").toLowerCase().includes(query) ||
           formatAmount(txn.amount).toLowerCase().includes(query)
         );
       })
@@ -79,28 +79,41 @@ export default function Page() {
   }, [searchTerm, sortOrder, transactionsData]);
 
   const recentClients = useMemo(() => {
-    const map = new Map<string, { clientOrg: string; clientName: string }>();
+    const map = new Map<
+      string,
+      { organization: string; employeeName: string }
+    >();
     transactionsData.forEach((txn) => {
-      if (!map.has(txn.clientOrg)) {
-        map.set(txn.clientOrg, {
-          clientOrg: txn.clientOrg,
-          clientName: txn.clientName,
+      const org = txn.organization || "";
+      if (!map.has(org)) {
+        map.set(org, {
+          organization: org,
+          employeeName: txn.employeeName || "",
         });
       }
     });
     return Array.from(map.values()).slice(0, 5);
   }, [transactionsData]);
 
-  const handlePaymentComplete = async (result: { hotelName: string; amount: number }) => {
+  const handlePaymentComplete = async (result: {
+    hotelName: string;
+    amount: number;
+  }) => {
     setShowWizard(false);
     const data = await getAllTransactions();
     setTransactionsData(data);
-    setPaymentDescription(`${result.hotelName} • ${formatAmount(result.amount)}`);
+    setPaymentDescription(
+      `${result.hotelName} • ${formatAmount(result.amount)}`,
+    );
     setPaymentConfirmed(true);
   };
 
   if (loading) {
-    return <div className="flex justify-center p-8"><Loader2Icon className="h-6 w-6 animate-spin text-slate-400" /></div>;
+    return (
+      <div className="flex justify-center p-8">
+        <Loader2Icon className="h-6 w-6 animate-spin text-slate-400" />
+      </div>
+    );
   }
 
   return (
@@ -157,7 +170,7 @@ export default function Page() {
             <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
               <tr>
                 <th className="px-6 py-4 font-semibold">Transaction details</th>
-                <th className="px-6 py-4 font-semibold">Client</th>
+                <th className="px-6 py-4 font-semibold">Employee</th>
                 <th className="px-6 py-4 font-semibold">Amount</th>
                 <th className="px-6 py-4 font-semibold text-right">Status</th>
               </tr>
@@ -196,9 +209,9 @@ export default function Page() {
                   </td>
                   <td className="px-6 py-4">
                     <p className="font-medium text-slate-900">
-                      {txn.clientName}
+                      {txn.employeeName}
                     </p>
-                    <p className="text-xs text-slate-500">{txn.clientOrg}</p>
+                    <p className="text-xs text-slate-500">{txn.organization}</p>
                   </td>
                   <td className="px-6 py-4 font-medium text-slate-900">
                     {formatAmount(txn.amount)}
