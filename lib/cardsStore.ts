@@ -92,7 +92,8 @@ export async function getCards(): Promise<Card[]> {
 
 export async function getMyCards(): Promise<Card[]> {
   const data = await api.get<ApiCard[]>("/cards/my")
-  return data.map(mapCard)
+  // Filter only ACTIVE cards
+  return data.filter(card => card.status === "ACTIVE").map(mapCard)
 }
 
 export async function getCardById(id: string): Promise<Card | null> {

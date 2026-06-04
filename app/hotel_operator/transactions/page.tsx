@@ -59,11 +59,11 @@ export function TransactionsOverview() {
         if (!query) return true;
 
         return (
-          txn.id.toLowerCase().includes(query) ||
           txn.title.toLowerCase().includes(query) ||
           (txn.employeeName || "").toLowerCase().includes(query) ||
           (txn.organization || "").toLowerCase().includes(query) ||
-          formatAmount(txn.amount).toLowerCase().includes(query)
+          formatAmount(txn.amount).toLowerCase().includes(query) ||
+          (txn.reference || "").toLowerCase().includes(query)
         );
       })
       .sort((a, b) => {
@@ -123,7 +123,7 @@ export function TransactionsOverview() {
                   <th className="px-6 py-4 font-semibold">
                     Transaction details
                   </th>
-                  <th className="px-6 py-4 font-semibold">ID</th>
+                  <th className="px-6 py-4 font-semibold">Reference</th>
                   <th className="px-6 py-4 font-semibold">Employee</th>
                   <th className="px-6 py-4 font-semibold">Amount</th>
                   <th className="px-6 py-4 font-semibold text-right">Status</th>
@@ -153,7 +153,7 @@ export function TransactionsOverview() {
                             {txn.title}
                           </p>
                           <p className="text-xs text-slate-500">
-                            {txn.datetime} • {txn.id}
+                            {txn.datetime}
                           </p>
                         </div>
                       </div>
@@ -184,7 +184,7 @@ export function TransactionsOverview() {
                 {filteredTransactions.length === 0 && (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       className="px-6 py-12 text-center text-sm text-slate-500"
                     >
                       No transactions found matching your search.

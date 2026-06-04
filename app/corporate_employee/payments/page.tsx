@@ -9,6 +9,7 @@ import {
   Loader2Icon,
 } from "lucide-react";
 import { CorporateEmployeePaymentWizard } from "@/components/corporate_employee/payment-wizard";
+import { useAuth } from "@/lib/auth-context";
 import {
   getAllTransactions,
   type CorporateEmployeeTransaction,
@@ -30,6 +31,7 @@ function getStatusStyles(statusVariant: string) {
 
 export default function Page() {
   const router = useRouter();
+  const { user, isLoading } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">(
     "amount_desc",
@@ -43,6 +45,11 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // prevent corporate admin from using employee payments page
+    if (!isLoading && user?.role === "CORPORATE_ADMIN") {
+      router.replace("/corporate_admin/my-card");
+      return;
+    }
     const load = async () => {
       try {
         const data = await getAllTransactions();
@@ -201,9 +208,7 @@ export default function Page() {
                         <p className="font-medium text-slate-900">
                           {txn.title}
                         </p>
-                        <p className="text-xs text-slate-500">
-                          {txn.datetime} • {txn.id}
-                        </p>
+                        <p className="text-xs text-slate-500">{txn.datetime}</p>
                       </div>
                     </div>
                   </td>

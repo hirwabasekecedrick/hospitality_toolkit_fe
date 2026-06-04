@@ -86,7 +86,8 @@ export default function AddCardPage() {
 
   const addEmployee = (value: { id: string; name: string } | string) => {
     if (!value) return;
-    if (cardType === "per diem" && selectedEmployees.length >= 1) return;
+    // Both card types limit to 1 team leader selection
+    if (selectedEmployees.length >= 1) return;
 
     if (typeof value === "string") {
       const id = `custom-${Date.now()}`;
@@ -105,10 +106,13 @@ export default function AddCardPage() {
 
   useEffect(() => {
     let mounted = true;
-    getEmployees("CORPORATE_EMPLOYEE")
-      .then((res) => {
+    Promise.all([
+      getEmployees("CORPORATE_EMPLOYEE"),
+      getEmployees("CORPORATE_ADMIN"),
+    ])
+      .then(([employees, admins]) => {
         if (!mounted) return;
-        setEmployees(res);
+        setEmployees([...employees, ...admins]);
       })
       .catch(() => {
         toast.error("Failed to load employees");
@@ -145,7 +149,10 @@ export default function AddCardPage() {
         purpose: purpose || undefined,
         distributed:
           cardType === "corporate expense" ? distributeToEmployees : false,
-        teamLeaderId: teamLeader?.id,
+        teamLeaderId:
+          cardType === "corporate expense"
+            ? selectedEmployees[0]?.id
+            : teamLeader?.id,
         employeeIds:
           cardType === "per diem"
             ? selectedEmployees.length > 0
@@ -209,30 +216,16 @@ export default function AddCardPage() {
                 <p className="text-sm text-slate-500">
                   {cardType === "per diem"
                     ? "Issue a card for a single employee to manage their own payments."
-                    : "Create a corporate expense card for a mission team, assign a leader, and optionally distribute access to the selected members."}
+                    : "Create a corporate expense card with a team leader to manage payments for their team."}
                 </p>
               </div>
 
               {cardType === "corporate expense" ? (
                 <div className="space-y-2">
-                  <Label>Team leader</Label>
-                  <select
-                    value={teamLeader?.id ?? ""}
-                    onChange={(e) => {
-                      const leader =
-                        employees.find((emp) => emp.id === e.target.value) ??
-                        null;
-                      setTeamLeader(leader);
-                    }}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
-                  >
-                    <option value="">Select team leader</option>
-                    {employees.map((employee) => (
-                      <option key={employee.id} value={employee.id}>
-                        {employee.name} • {employee.role}
-                      </option>
-                    ))}
-                  </select>
+                  <p className="text-sm text-slate-600">
+                    Select the team leader who will manage this corporate
+                    expense card.
+                  </p>
                 </div>
               ) : null}
 
@@ -240,7 +233,7 @@ export default function AddCardPage() {
                 <Label>
                   {cardType === "per diem"
                     ? "Employee / Cardholder"
-                    : "Selected team members"}
+                    : "Team Leader"}
                 </Label>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
                   <div className="flex flex-wrap gap-2">
@@ -262,7 +255,12 @@ export default function AddCardPage() {
                         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
                           <UserIcon className="h-4 w-4 text-slate-500" />
                           <span className="text-sm text-slate-500">
-                            Search employees or type a name
+                            {selectedEmployees.length === 0
+                              ? "Select "
+                              : "Change "}{" "}
+                            {cardType === "per diem"
+                              ? "an employee"
+                              : "the team leader"}
                           </span>
                         </div>
                       </PopoverTrigger>
@@ -315,7 +313,8 @@ export default function AddCardPage() {
                 </div>
               </div>
 
-              {cardType === "corporate expense" ? (
+              {cardType === "corporate expense" &&
+              selectedEmployees.length > 0 ? (
                 <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
                     <input
@@ -326,13 +325,11 @@ export default function AddCardPage() {
                       }
                       className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                     />
-                    Distribute the corporate expense card to the selected
-                    employees
+                    Team leader can distribute this card
                   </label>
                   <p className="text-sm text-slate-500">
-                    When distributed, selected employees will see the remaining
-                    balance and transactions. If not distributed, only the team
-                    leader will have full visibility.
+                    When enabled, the team leader can grant other employees
+                    access to this card and its balance information.
                   </p>
                 </div>
               ) : null}
@@ -435,7 +432,11 @@ export default function AddCardPage() {
                 </div>
                 <div className="grid gap-3">
                   <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                    <p className="text-sm text-slate-500">Assigned employees</p>
+                    <p className="text-sm text-slate-500">
+                      {cardType === "per diem"
+                        ? "Assigned employee"
+                        : "Team leader"}
+                    </p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {selectedEmployees.length > 0 ? (
                         selectedEmployees.map((employee) => (
@@ -448,7 +449,10 @@ export default function AddCardPage() {
                         ))
                       ) : (
                         <span className="text-sm text-slate-500">
-                          No employee selected yet.
+                          {cardType === "per diem"
+                            ? "No employee"
+                            : "No team leader"}{" "}
+                          selected yet.
                         </span>
                       )}
                     </div>

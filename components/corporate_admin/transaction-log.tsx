@@ -54,11 +54,9 @@ export function TransactionLog() {
   const filteredTransactions = transactions.filter((t) => {
     const hotel = t.title || "";
     const employee = t.employeeName || "";
-    const id = t.id || "";
     const matchesSearch =
       hotel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      id.toLowerCase().includes(searchTerm.toLowerCase());
+      employee.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || t.status.toLowerCase() === statusFilter;
     return matchesSearch && matchesStatus;
@@ -94,7 +92,7 @@ export function TransactionLog() {
           <div className="relative flex-1 max-w-sm">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input
-              placeholder="Search by hotel, employee, or ID..."
+              placeholder="Search by hotel or employee..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 bg-white"
@@ -128,7 +126,6 @@ export function TransactionLog() {
             <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-semibold">
               <tr>
                 <th className="px-6 py-4 w-10"></th>
-                <th className="px-6 py-4">Transaction ID</th>
                 <th className="px-6 py-4">Date</th>
                 <th className="px-6 py-4">Hotel Property</th>
                 <th className="px-6 py-4">Employee</th>
@@ -149,9 +146,6 @@ export function TransactionLog() {
                       ) : (
                         <ChevronDownIcon className="h-5 w-5" />
                       )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-mono text-slate-600">
-                      {tx.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-slate-600">
                       {new Date(tx.datetime).toLocaleDateString()}
@@ -182,13 +176,17 @@ export function TransactionLog() {
                   {/* Expanded Receipt Detail */}
                   {expandedRows[tx.id] && (
                     <tr className="bg-slate-50 border-t-0">
-                      <td colSpan={7} className="px-14 py-6">
+                      <td colSpan={6} className="px-14 py-6">
                         <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                           <h4 className="font-semibold text-slate-900 flex items-center gap-2">
                             <FileTextIcon className="h-4 w-4 text-blue-600" />
                             Transaction Details
                           </h4>
                           <div className="mt-3 grid grid-cols-2 gap-y-2 text-sm">
+                            <span className="text-slate-500">
+                              Transaction ID:
+                            </span>
+                            <span className="font-medium">{tx.id}</span>
                             <span className="text-slate-500">Reference:</span>
                             <span className="font-medium">{tx.reference}</span>
                             <span className="text-slate-500">Date/Time:</span>
@@ -218,7 +216,7 @@ export function TransactionLog() {
               {filteredTransactions.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={6}
                     className="px-6 py-12 text-center text-slate-500"
                   >
                     <SearchIcon className="mx-auto h-8 w-8 text-slate-300 mb-3" />

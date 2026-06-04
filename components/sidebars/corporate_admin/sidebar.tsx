@@ -162,6 +162,55 @@ export function Corporate_Admin_Sidebar({
               );
             })}
           </SidebarMenu>
+          {/* My card (collapsible) for admins */}
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link
+                  href={`${DIRECTORY}/my-card`}
+                  className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-slate-700 hover:bg-emerald-50`}
+                  onClick={handleNavClick}
+                >
+                  <CreditCardIcon
+                    className={`size-4 shrink-0 text-slate-400`}
+                  />
+                  <span className="truncate">My card</span>
+                </Link>
+              </SidebarMenuButton>
+              <SidebarMenuSub>
+                <SidebarMenuSubItem>
+                  <SidebarMenuSubButton asChild>
+                    <Link
+                      href={`${DIRECTORY}/my-card`}
+                      onClick={handleNavClick}
+                    >
+                      Overview
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+                <SidebarMenuSubItem>
+                  <SidebarMenuSubButton asChild>
+                    <Link
+                      href={`${DIRECTORY}/my-card/transactions`}
+                      onClick={handleNavClick}
+                    >
+                      Transactions
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+                <SidebarMenuSubItem>
+                  <SidebarMenuSubButton asChild>
+                    <Link
+                      href="/corporate_employee/payments"
+                      onClick={handleNavClick}
+                    >
+                      Pay
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              </SidebarMenuSub>
+            </SidebarMenuItem>
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarRail />

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Image from "next/image"
+import * as React from "react";
+import Image from "next/image";
 
 import {
   Sidebar,
@@ -15,7 +15,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { useAuth } from "@/lib/auth-context";
 
 // This is sample data.
 const data = {
@@ -156,9 +157,11 @@ const data = {
       ],
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, isLoading } = useAuth();
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -206,8 +209,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             ))}
           </SidebarMenu>
         </SidebarGroup>
+        {/* Role-based links */}
+        <SidebarGroup>
+          <SidebarMenu>
+            {!isLoading &&
+              (user?.role === "CORPORATE_ADMIN" ||
+                user?.role === "CORPORATE_EMPLOYEE") && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a href="/corporate_admin/my-card" className="font-medium">
+                      My card
+                    </a>
+                  </SidebarMenuButton>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild>
+                        <a href="/corporate_admin/my-card">Overview</a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild>
+                        <a href="/corporate_admin/my-card/transactions">
+                          Transactions
+                        </a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild>
+                        <a href="/corporate_employee/payments">Pay</a>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              )}
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

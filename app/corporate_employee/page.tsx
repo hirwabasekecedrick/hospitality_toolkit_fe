@@ -15,7 +15,10 @@ import {
   CheckCircle2Icon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { getAllTransactions, type CorporateEmployeeTransaction } from "@/lib/corporateEmployeeTransactions";
+import {
+  getAllTransactions,
+  type CorporateEmployeeTransaction,
+} from "@/lib/corporateEmployeeTransactions";
 import { getMyCards, changeCardPassword } from "@/lib/cardsStore";
 
 const stats = [
@@ -93,14 +96,21 @@ function ChangePasswordModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
       <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-slate-900">Change Card Password</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <h3 className="text-lg font-semibold text-slate-900">
+            Change Card Password
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600"
+          >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Current Password</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Current Password
+            </label>
             <input
               type="password"
               value={oldPassword}
@@ -110,7 +120,9 @@ function ChangePasswordModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">New Password</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              New Password
+            </label>
             <input
               type="password"
               value={newPassword}
@@ -121,7 +133,9 @@ function ChangePasswordModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Confirm New Password</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Confirm New Password
+            </label>
             <input
               type="password"
               value={confirmPassword}
@@ -151,36 +165,56 @@ export default function Page() {
     id: string;
     issueType: "Per diem" | "Corporate expense";
     amount: number;
+    spent: number;
     last4: string;
     cardholder: string;
     status: string;
   } | null>(null);
   const [cardLoading, setCardLoading] = useState(true);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [recentTransactions, setRecentTransactions] = useState<CorporateEmployeeTransaction[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<
+    CorporateEmployeeTransaction[]
+  >([]);
   const [txnLoading, setTxnLoading] = useState(true);
 
+  const loadCard = async () => {
+    try {
+      setCardLoading(true);
+      const cards = await getMyCards();
+      if (cards.length > 0) {
+        const c = cards[0];
+        setCard({
+          id: c.id,
+          issueType: c.issueType,
+          amount: c.amount || 0,
+          spent: c.spent || 0,
+          last4: c.last4 || "****",
+          cardholder: c.cardholder,
+          status: c.status,
+        });
+      } else {
+        setCard(null);
+      }
+    } catch {
+    } finally {
+      setCardLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        const cards = await getMyCards();
-        if (cards.length > 0) {
-          const c = cards[0];
-          setCard({
-            id: c.id,
-            issueType: c.issueType,
-            amount: c.amount || 0,
-            last4: c.last4 || "****",
-            cardholder: c.cardholder,
-            status: c.status,
-          });
-        }
-      } catch {
-      } finally {
-        setCardLoading(false);
+    loadCard();
+  }, []);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadCard();
       }
     };
-    load();
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   useEffect(() => {
@@ -244,9 +278,12 @@ export default function Page() {
                     <div className="px-3 py-2 text-xs uppercase tracking-[0.2em] text-white/90">
                       <div className="flex items-center justify-between gap-3">
                         <div>
+                          <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80 mb-2">
+                            Remaining balance
+                          </p>
                           <p className="mt-2 text-3xl font-semibold text-white">
                             {showAmount
-                              ? formattedAmount(card.amount)
+                              ? formattedAmount(card.amount - card.spent)
                               : "RWF ••••••"}
                           </p>
                         </div>
@@ -281,14 +318,14 @@ export default function Page() {
           ) : (
             <div className="rounded-[2rem] border border-dashed border-white/25 bg-white/5 p-6 text-white">
               <p className="text-sm uppercase tracking-[0.3em] text-emerald-200/80">
-                No card available
+                No active card
               </p>
               <h2 className="mt-4 text-3xl font-semibold">
-                You don&apos;t have a corporate card yet.
+                No active card available
               </h2>
               <p className="mt-3 text-sm text-emerald-100/80">
-                Request a card from your finance team and it will appear here
-                with the card ID, type, and amount details.
+                Your card has been cancelled or is not yet active. Request a new
+                card from your finance team.
               </p>
             </div>
           )}
@@ -381,7 +418,9 @@ export default function Page() {
                   <button
                     key={txn.id}
                     type="button"
-                    onClick={() => router.push(`/corporate_employee/payments/${txn.id}`)}
+                    onClick={() =>
+                      router.push(`/corporate_employee/payments/${txn.id}`)
+                    }
                     className="w-full rounded-3xl bg-white p-4 text-left shadow-sm border border-slate-200 transition hover:border-emerald-200 hover:shadow-md"
                   >
                     <div className="flex items-center justify-between gap-4">

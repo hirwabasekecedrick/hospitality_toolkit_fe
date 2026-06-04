@@ -86,6 +86,9 @@ interface ApiTransaction {
   clientName?: string
   clientOrg?: string
   card?: { id: string; last4?: string; type?: string }
+  // compact API shape (from backend)
+  employeeName?: string
+  hotelName?: string
 }
 
 interface ApiNotification {
@@ -106,12 +109,13 @@ function mapTransaction(t: ApiTransaction): CorporateEmployeeTransaction {
   const icon: "receipt" | "arrow" | "alert" =
     t.status === "SETTLED" ? "receipt" :
     t.status === "PENDING" ? "arrow" : "alert"
-  const employeeName = t.user ? `${t.user.firstName} ${t.user.lastName}` : "Unknown"
+  // Use compact API shape if available, otherwise fall back to user relation
+  const employeeName = t.employeeName || (t.user ? `${t.user.firstName} ${t.user.lastName}` : "Unknown")
   const organization = t.clientOrg || ""
 
   return {
     id: t.id,
-    title: t.description || "Transaction",
+    title: t.title || t.description || "Transaction",
     datetime: t.createdAt ? new Date(t.createdAt).toLocaleString() : "",
     amount: t.amount,
     status,
@@ -121,7 +125,7 @@ function mapTransaction(t: ApiTransaction): CorporateEmployeeTransaction {
     serviceProviderId: t.serviceProviderId || "",
     paymentMethod: t.paymentMethod || "Corporate card",
     reference: t.reference || `REF-${t.id.slice(0, 8)}`,
-    details: t.description || "",
+    details: t.details || t.description || "",
     employeeName,
     organization,
   }
