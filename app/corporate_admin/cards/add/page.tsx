@@ -35,11 +35,11 @@ import { ChevronLeftIcon, PlusIcon, UserIcon } from "lucide-react";
 // employees will be fetched from backend
 
 const defaultPurposes = [
-  "Travel",
-  "Marketing",
-  "Office Supplies",
-  "Events",
-  "Training",
+  "Venue Hire",
+  "Meetings",
+  "Banqueting",
+  "Event hosting",
+  "Refreshments",
 ];
 
 export default function AddCardPage() {
@@ -65,7 +65,7 @@ export default function AddCardPage() {
   const [purpose, setPurpose] = useState("");
   const [amount, setAmount] = useState("");
   const [validityType, setValidityType] = useState<"single" | "range">(
-    "single",
+    "range",
   );
   const [validFrom, setValidFrom] = useState("");
   const [validUntil, setValidUntil] = useState("");
@@ -75,14 +75,16 @@ export default function AddCardPage() {
   const filteredEmployees = useMemo(() => {
     const q = employeeQuery.trim().toLowerCase();
     const selectedIds = new Set(selectedEmployees.map((s) => s.id));
+
     return employees.filter((employee) => {
       const role = (employee.role || "").toLowerCase();
+
       return (
         !selectedIds.has(employee.id) &&
         (employee.name.toLowerCase().includes(q) || role.includes(q))
       );
     });
-  }, [employeeQuery, selectedEmployees]);
+  }, [employees, employeeQuery, selectedEmployees]);
 
   const addEmployee = (value: { id: string; name: string } | string) => {
     if (!value) return;
@@ -188,7 +190,7 @@ export default function AddCardPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl bg-white p-6">
+      <div className="rounded-3xl bg-white px-2">
         <form className="space-y-8" onSubmit={handleSubmit}>
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-6">
@@ -213,11 +215,6 @@ export default function AddCardPage() {
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
-                <p className="text-sm text-slate-500">
-                  {cardType === "per diem"
-                    ? "Issue a card for a single employee to manage their own payments."
-                    : "Create a corporate expense card with a team leader to manage payments for their team."}
-                </p>
               </div>
 
               {cardType === "corporate expense" ? (
@@ -236,20 +233,7 @@ export default function AddCardPage() {
                     : "Team Leader"}
                 </Label>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="flex flex-wrap gap-2">
-                    {selectedEmployees.map((employee) => (
-                      <button
-                        type="button"
-                        key={employee.id}
-                        onClick={() => removeEmployee(employee.id)}
-                        className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-sm text-slate-700 transition hover:border-slate-400"
-                      >
-                        {employee.name}
-                        <span className="text-slate-400">×</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-3">
+                  <div className="flex flex-col gap-2">
                     <Popover>
                       <PopoverTrigger asChild>
                         <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300">
@@ -302,13 +286,26 @@ export default function AddCardPage() {
                                 addEmployee(employeeQuery.trim());
                               }
                             }}
-                            className="flex-1"
+                            className="flex-1 "
                           >
                             Add "{employeeQuery || "custom name"}"
                           </Button>
                         </div>
                       </PopoverContent>
                     </Popover>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedEmployees.map((employee) => (
+                        <button
+                          type="button"
+                          key={employee.id}
+                          onClick={() => removeEmployee(employee.id)}
+                          className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-100 px-3 py-1 text-sm text-emerald-700 transition hover:border-emerald-400"
+                        >
+                          {employee.name}
+                          <span className="text-slate-400">×</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -333,36 +330,37 @@ export default function AddCardPage() {
                   </p>
                 </div>
               ) : null}
-
               <div className="space-y-2">
                 <Label htmlFor="purpose">Purpose</Label>
-                <Input
-                  id="purpose"
-                  value={purpose}
-                  onChange={(event) => setPurpose(event.target.value)}
-                  placeholder="e.g. Q3 Marketing Trip"
-                />
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {defaultPurposes.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => handlePurposeChip(item)}
-                      className={`rounded-2xl border px-3 py-2 text-left text-sm transition ${
-                        purpose === item
-                          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                      }`}
-                    >
-                      {item}
-                    </button>
-                  ))}
+                <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                  <Input
+                    id="purpose"
+                    value={purpose}
+                    onChange={(event) => setPurpose(event.target.value)}
+                    placeholder="e.g. Q3 Marketing Trip"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {defaultPurposes.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => handlePurposeChip(item)}
+                        className={`w-fit rounded-2xl border px-3 py-2 text-left text-sm transition ${
+                          purpose === item
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                            : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount Ceiling (RWF)</Label>
+                  <Label htmlFor="amount">Amount (RWF)</Label>
                   <Input
                     id="amount"
                     type="number"
@@ -412,10 +410,7 @@ export default function AddCardPage() {
                   </div>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                  Single use cards are valid for exactly one approved
-                  transaction.
-                </div>
+                <div></div>
               )}
             </div>
 

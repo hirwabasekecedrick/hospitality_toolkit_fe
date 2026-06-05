@@ -30,7 +30,9 @@ import {
 
 export function CardDetailsPageClient({ cardId }: { cardId: string }) {
   const [cardData, setCardData] = useState<any>(null);
-  const [transactions, setTransactions] = useState<CorporateEmployeeTransaction[]>([]);
+  const [transactions, setTransactions] = useState<
+    CorporateEmployeeTransaction[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">(
@@ -101,15 +103,12 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
   const progressPercent = limit > 0 ? (spent / limit) * 100 : 0;
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-8 w-full">
+    <div className="flex flex-col gap-4 sm:gap-6 p-2 sm:p-2 lg:p-4 w-full">
       <div className="flex flex-col gap-2 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
             Card Details
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage limits and settings for this card
-          </p>
         </div>
       </div>
 
@@ -136,14 +135,23 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
                     <span className="text-white">{cardData.last4}</span>
                   </div>
                 </div>
-                <div className="flex h-10 w-14 sm:h-12 sm:w-16 items-center justify-center rounded-lg sm:rounded-xl bg-white/20 backdrop-blur-sm border border-white/20 flex-shrink-0">
-                  <CreditCardIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                <div className="flex h-10 w-auto sm:h-12 p-4 items-center justify-center rounded-lg sm:rounded-xl bg-white/20 backdrop-blur-sm border border-white/20 flex-shrink-0">
+                  {/* <CreditCardIcon className="h-5 w-5 sm:h-6 sm:w-6 text-white" /> */}
+                  {new Date(cardData.validFrom).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                  })}{" "}
+                  -{" "}
+                  {new Date(cardData.validUntil).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                  })}{" "}
                 </div>
               </div>
 
               <div className="mt-6 sm:mt-8 relative z-10">
                 <div className="flex justify-between text-xs sm:text-sm mb-2 text-emerald-50">
-                  <span>Limit: RWF {limit.toLocaleString()}</span>
+                  <span>Limit: {limit.toLocaleString()}</span>
                   <span>{Math.round(progressPercent)}% used</span>
                 </div>
                 <Progress
@@ -173,15 +181,12 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
           </Card>
 
           <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="pb-3 sm:pb-4">
+            <CardHeader className="">
               <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <CardTitle className="text-base sm:text-lg font-semibold text-slate-900">
                     Recent Transactions
                   </CardTitle>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    Search and sort this card&apos;s transactions.
-                  </p>
                 </div>
               </div>
             </CardHeader>
@@ -197,6 +202,7 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
                       className="border-0 bg-transparent px-0 py-0 focus:ring-0 text-xs sm:text-sm"
                     />
                   </div>
+                  <div className="bg-red-400 rounded-lg border border-slate-200 bg-white px-3">
                   <select
                     value={sortOrder}
                     onChange={(e) =>
@@ -204,11 +210,12 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
                         e.target.value as "amount_desc" | "amount_asc",
                       )
                     }
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm text-slate-700 outline-none"
+                    className=" px-3 w-full py-2 text-xs sm:text-sm text-slate-700 outline-none"
                   >
                     <option value="amount_desc">High to low</option>
                     <option value="amount_asc">Low to high</option>
                   </select>
+                  </div>
                 </div>
               </div>
 
@@ -251,12 +258,12 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
 
         <div className="flex flex-col gap-3 sm:gap-4">
           <Card className="border-slate-200 shadow-sm">
-            <CardHeader className="pb-3">
+            <CardHeader className="">
               <CardTitle className="text-base font-semibold text-slate-900">
                 Card Controls
               </CardTitle>
               <CardDescription className="text-xs">
-                Manage card settings
+                
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
@@ -273,13 +280,6 @@ export function CardDetailsPageClient({ cardId }: { cardId: string }) {
               >
                 <BanIcon className="h-4 w-4 text-orange-500 flex-shrink-0" />
                 <span className="truncate">Suspend Card</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-2 h-9 sm:h-11 bg-white hover:bg-slate-50 transition-colors text-slate-700 text-xs sm:text-sm"
-              >
-                <RefreshCcwIcon className="h-4 w-4 text-slate-500 flex-shrink-0" />
-                <span className="truncate">Replace Card</span>
               </Button>
               <div className="pt-2 sm:pt-3 mt-2 border-t border-slate-100">
                 <Button
