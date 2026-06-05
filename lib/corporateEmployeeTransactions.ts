@@ -37,6 +37,7 @@ export type CorporateEmployeeTransaction = {
   amount: number
   status: string
   hotelName?: string
+  card?: any
   statusVariant: "success" | "warning" | "neutral"
   icon: "receipt" | "arrow" | "alert"
   userId: string
@@ -63,6 +64,8 @@ export type CorporateEmployeeNotification = {
 interface ApiTransaction {
   id: string
   amount: number
+  title?: string
+  details?: string
   status: string
   description?: string
   reference?: string

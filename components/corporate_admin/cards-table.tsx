@@ -158,7 +158,7 @@ export function CardsTable() {
                         </div>
                         <div>
                           <p className="font-medium text-slate-900">
-                            {card.employees[0]?.name}
+                            {card.employees?.[0]?.name}
                           </p>
                           <p className="font-mono text-xs text-slate-500">
                             **** **** **** {card.last4}
