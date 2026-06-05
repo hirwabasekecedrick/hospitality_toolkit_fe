@@ -36,6 +36,7 @@ export type CorporateEmployeeTransaction = {
   datetime: string
   amount: number
   status: string
+  hotelName?: string
   statusVariant: "success" | "warning" | "neutral"
   icon: "receipt" | "arrow" | "alert"
   userId: string

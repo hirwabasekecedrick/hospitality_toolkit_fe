@@ -123,7 +123,7 @@ export function TransactionsOverview() {
                   <th className="px-6 py-4 font-semibold">
                     Transaction details
                   </th>
-                  <th className="px-6 py-4 font-semibold">Reference</th>
+                  {/* <th className="px-6 py-4 font-semibold">Reference</th> */}
                   <th className="px-6 py-4 font-semibold">Employee</th>
                   <th className="px-6 py-4 font-semibold">Amount</th>
                   <th className="px-6 py-4 font-semibold text-right">Status</th>
@@ -158,11 +158,11 @@ export function TransactionsOverview() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <p className="font-medium text-slate-900">
                         {txn.reference}
                       </p>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4">
                       <p className="font-medium text-slate-900">
                         {txn.employeeName}

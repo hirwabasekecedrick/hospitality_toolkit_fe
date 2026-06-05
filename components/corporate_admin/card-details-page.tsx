@@ -30,9 +30,7 @@ import {
 
 export function CardDetailsPageClient({ cardId }: { cardId: string }) {
   const [cardData, setCardData] = useState<any>(null);
-  const [transactions, setTransactions] = useState<
-    CorporateEmployeeTransaction[]
-  >([]);
+  const [transactions, setTransactions] = useState<CorporateEmployeeTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState<"amount_desc" | "amount_asc">(
