@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://hospitalitytoolkitbe-production.up.railway.app/api"
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"
 
 function getCsrfToken(): string | null {
   if (typeof document === "undefined") return null
