@@ -31,6 +31,16 @@ async function request<T>(
   if (csrf && ["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
     headers["x-csrf-token"] = csrf
   }
+  
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    if (!headers["X-Idempotency-Key"]) {
+      if (typeof crypto !== "undefined" && crypto.randomUUID) {
+        headers["X-Idempotency-Key"] = crypto.randomUUID()
+      } else {
+        headers["X-Idempotency-Key"] = "idemp-" + Date.now() + "-" + Math.random().toString(36).substring(2, 9)
+      }
+    }
+  }
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
     headers,

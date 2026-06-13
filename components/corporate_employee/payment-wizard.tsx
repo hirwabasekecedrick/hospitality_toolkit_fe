@@ -173,7 +173,7 @@ export function CorporateEmployeePaymentWizard({ onComplete, onCancel }: Payment
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Amount (RWF)</label>
+              <label className="text-sm font-medium text-slate-700">Amount</label>
               <input
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -217,7 +217,7 @@ export function CorporateEmployeePaymentWizard({ onComplete, onCancel }: Payment
               </div>
               <div className="flex justify-between border-t border-slate-200 pt-2">
                 <span className="text-sm text-slate-500">Total</span>
-                <span className="text-xl font-semibold text-slate-900">RWF {Number(amount).toLocaleString()}</span>
+                <span className="text-xl font-semibold text-slate-900">{cards.find(c => c.id === selectedCardId)?.currency || 'RWF'} {Number(amount).toLocaleString()}</span>
               </div>
             </div>
 
@@ -233,7 +233,7 @@ export function CorporateEmployeePaymentWizard({ onComplete, onCancel }: Payment
                   <CreditCardIcon className="h-5 w-5 text-slate-500" />
                   <div>
                     <p className="font-medium text-slate-900">{activeCards[0].issueType} •••• {activeCards[0].last4}</p>
-                    <p className="text-xs text-slate-500">Remaining: RWF {cardRemaining(activeCards[0]).toLocaleString()}</p>
+                    <p className="text-xs text-slate-500">Remaining: {activeCards[0].currency || 'RWF'} {cardRemaining(activeCards[0]).toLocaleString()}</p>
                   </div>
                 </div>
               ) : (
@@ -244,7 +244,7 @@ export function CorporateEmployeePaymentWizard({ onComplete, onCancel }: Payment
                       <CreditCardIcon className="h-5 w-5 text-slate-500 shrink-0" />
                       <div className="min-w-0">
                         <p className="font-medium text-slate-900 truncate">{card.issueType} •••• {card.last4}</p>
-                        <p className="text-xs text-slate-500">Remaining: RWF {cardRemaining(card).toLocaleString()}</p>
+                        <p className="text-xs text-slate-500">Remaining: {card.currency || 'RWF'} {cardRemaining(card).toLocaleString()}</p>
                       </div>
                     </label>
                   ))}
@@ -277,7 +277,7 @@ export function CorporateEmployeePaymentWizard({ onComplete, onCancel }: Payment
                 Back
               </button>
               <button type="button" onClick={handleConfirm} disabled={!canConfirm || submitting || activeCards.length === 0} className="inline-flex items-center justify-center rounded-2xl bg-emerald-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50">
-                {submitting ? <><Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : "Pay RWF " + Number(amount).toLocaleString()}
+                {submitting ? <><Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : `Pay ${cards.find(c => c.id === selectedCardId)?.currency || 'RWF'} ` + Number(amount).toLocaleString()}
               </button>
             </div>
           </div>
