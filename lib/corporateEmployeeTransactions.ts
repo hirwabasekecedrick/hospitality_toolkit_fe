@@ -109,9 +109,11 @@ function mapTransaction(t: ApiTransaction): CorporateEmployeeTransaction {
   const status = t.status.charAt(0).toUpperCase() + t.status.slice(1).toLowerCase()
   const statusVariant: "success" | "warning" | "neutral" =
     t.status === "SETTLED" ? "success" :
+    t.status === "CONFIRMED" ? "success" :
     t.status === "DISPUTED" ? "warning" : "neutral"
   const icon: "receipt" | "arrow" | "alert" =
     t.status === "SETTLED" ? "receipt" :
+    t.status === "CONFIRMED" ? "receipt" :
     t.status === "PENDING" ? "arrow" : "alert"
   // Use compact API shape if available, otherwise fall back to user relation
   const employeeName = t.employeeName || (t.user ? `${t.user.firstName} ${t.user.lastName}` : "Unknown")
@@ -212,3 +214,8 @@ export async function getNotificationById(id: string): Promise<CorporateEmployee
     return null
   }
 }
+
+export async function redeemBatch(transactionIds: string[]): Promise<any> {
+  return api.post("/payments/redeem-batch", { transactionIds })
+}
+
